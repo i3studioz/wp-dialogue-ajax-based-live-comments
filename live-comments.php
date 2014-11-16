@@ -41,10 +41,10 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-live-comments-activat
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-live-comments-deactivator.php';
 
 /** This action is documented in includes/class-live-comments-activator.php */
-register_activation_hook( __FILE__, array( 'Plugin_Name_Activator', 'activate' ) );
+register_activation_hook( __FILE__, array( 'Live_Comments_Activator', 'activate' ) );
 
 /** This action is documented in includes/class-live-comments-deactivator.php */
-register_deactivation_hook( __FILE__, array( 'Plugin_Name_Deactivator', 'deactivate' ) );
+register_deactivation_hook( __FILE__, array( 'Live_Comments_Deactivator', 'deactivate' ) );
 
 /**
  * The core plugin class that is used to define internationalization,

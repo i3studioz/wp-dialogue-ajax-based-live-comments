@@ -22,63 +22,70 @@
  */
 class Live_Comments_Public {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
-	private $plugin_name;
+    /**
+     * The ID of this plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $plugin_name    The ID of this plugin.
+     */
+    private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
-	private $version;
+    /**
+     * The version of this plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $version    The current version of this plugin.
+     */
+    private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 * @var      string    $plugin_name       The name of the plugin.
-	 * @var      string    $version    The version of this plugin.
-	 */
-	public function __construct( $plugin_name, $version ) {
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since    1.0.0
+     * @var      string    $plugin_name       The name of the plugin.
+     * @var      string    $version    The version of this plugin.
+     */
+    public function __construct($plugin_name, $version) {
 
-		$this->plugin_name = 'live-comments';
-		$this->version = '1.0.0';
+        $this->plugin_name = 'live-comments';
+        $this->version = '1.0.0';
+    }
 
-	}
+    /**
+     * Register the stylesheets for the public-facing side of the site.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_styles() {
+        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/live-comments-public.css', array(), $this->version, 'all');
+    }
 
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_styles() {
-            wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-public.css', array(), $this->version, 'all' );
-	}
+    /**
+     * Register the JavaScripts for the public-facing side of the site.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_scripts() {
 
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_scripts() {
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('underscore');
+        wp_enqueue_script('backbone');
+        wp_enqueue_script($this->plugin_name . '-md5', plugin_dir_url(__FILE__) . 'js/libs/md5/md5.js', array('jquery'), $this->version, true);
+        wp_enqueue_script($this->plugin_name . '-model', plugin_dir_url(__FILE__) . 'js/models/comment.js', array('jquery'), $this->version, true);
+        wp_enqueue_script($this->plugin_name . '-collection', plugin_dir_url(__FILE__) . 'js/collections/comments.js', array('jquery'), $this->version, true);
+        wp_enqueue_script($this->plugin_name . '-view', plugin_dir_url(__FILE__) . 'js/views/comments.js', array('jquery'), $this->version, true);
+        wp_enqueue_script($this->plugin_name . '-app', plugin_dir_url(__FILE__) . 'js/app.js', array('jquery'), $this->version, true);
+    }
 
-            wp_enqueue_script('jquery');
-            wp_enqueue_script('underscore');
-            wp_enqueue_script('backbone');
-            wp_enqueue_script( $this->plugin_name.'-md5', plugin_dir_url( __FILE__ ) . 'js/libs/md5/md5.js', array( 'jquery' ), $this->version, false );
-            wp_enqueue_script( $this->plugin_name.'-model', plugin_dir_url( __FILE__ ) . 'js/models/comment.js', array( 'jquery' ), $this->version, false );
-            wp_enqueue_script( $this->plugin_name.'-collection', plugin_dir_url( __FILE__ ) . 'js/collections/comments.js', array( 'jquery' ), $this->version, false );
-            wp_enqueue_script( $this->plugin_name.'-view', plugin_dir_url( __FILE__ ) . 'js/views/comments.js', array( 'jquery' ), $this->version, false );
-            wp_enqueue_script( $this->plugin_name.'-app', plugin_dir_url( __FILE__ ) . 'js/app.js', array( 'jquery' ), $this->version, false );
-
-	}
+    public function lc_comments_template($comment_template) {
+        global $post;
+        if (!( is_singular() && ( have_comments() || 'open' == $post->comment_status ) )) {
+            return;
+        } else {
+            return dirname(__FILE__) . 'partials/live-comments-public-display.php';
+        }
+    }
 
 }
