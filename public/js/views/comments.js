@@ -1,5 +1,5 @@
 var app = app || {};
-
+var $ = jQuery;
 app.CommentView = Backbone.View.extend({
     el: $('#commentapp'),
     template: _.template($('#comments-template').html()),
@@ -24,7 +24,7 @@ app.CommentView = Backbone.View.extend({
         var self = this;
         _(this.collection.models).each(function(comment) {
             self.appendItem(comment);
-        }, this)
+        }, this);
 
     },
     getAvatarUrl: function($string){
@@ -37,7 +37,7 @@ app.CommentView = Backbone.View.extend({
             author: this.$author.val().trim(),
             email: this.$email.val().trim(),
             avatar: this.getAvatarUrl(this.$email.val().trim())
-        }
+        };
 
     },
     saveComment: function() {

@@ -1,4 +1,3 @@
-<php echo 'tesrt'; ?>
             <div class="row">
                 <div id="commentapp" class="col-md-12">
                     <h1>Comments</h1>

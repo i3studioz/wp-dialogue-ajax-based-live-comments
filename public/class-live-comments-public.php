@@ -84,7 +84,7 @@ class Live_Comments_Public {
         if (!( is_singular() && ( have_comments() || 'open' == $post->comment_status ) )) {
             return;
         } else {
-            return dirname(__FILE__) . 'partials/live-comments-public-display.php';
+            return plugin_dir_path( __FILE__ ) . 'partials/live-comments-public-display.php';
         }
     }
 
