@@ -19,9 +19,9 @@
  *
  * @package    Plugin_Name
  * @subpackage Plugin_Name/includes
- * @author     Your Name <email@example.com>
+ * @author     Arun Singh <devarun444@gmail.com>
  */
-class Plugin_Name_Loader {
+class Live_Comments_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.

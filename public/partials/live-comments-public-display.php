@@ -39,14 +39,3 @@
             <button id="reply" class="btn btn-primary pull-right">Reply</button></p>
             </li>
         </script>
-        <script src="js/libs/jquery/jquery.js"></script>
-        <script src="js/libs/underscore/underscore.js"></script>
-        <script src="js/libs/backbone/backbone.js"></script>
-        <script src="js/libs/backbone/backbone.localStorage.js"></script>
-        <script src="js/libs/bootstrap/bootstrap.min.js"></script>
-        <script src="js/libs/md5/md5.js"></script>
-        <script src="js/models/comment.js"></script>
-        <script src="js/collections/comments.js"></script>
-        <script src="js/views/comments.js"></script>
-        <script src="js/routers/router.js"></script>
-        <script src="js/app.js"></script>

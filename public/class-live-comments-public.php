@@ -20,7 +20,7 @@
  * @subpackage Live_Comments/public
  * @author     Arun Singh <devarun444@gmail.com>
  */
-class Plugin_Name_Public {
+class Live_Comments_Public {
 
 	/**
 	 * The ID of this plugin.
@@ -60,21 +60,7 @@ class Plugin_Name_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Plugin_Name_Public_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Plugin_Name_Public_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-public.css', array(), $this->version, 'all' );
-
+            wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-public.css', array(), $this->version, 'all' );
 	}
 
 	/**
@@ -84,19 +70,14 @@ class Plugin_Name_Public {
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Plugin_Name_Public_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Plugin_Name_Public_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-public.js', array( 'jquery' ), $this->version, false );
+            wp_enqueue_script('jquery');
+            wp_enqueue_script('underscore');
+            wp_enqueue_script('backbone');
+            wp_enqueue_script( $this->plugin_name.'-md5', plugin_dir_url( __FILE__ ) . 'js/libs/md5/md5.js', array( 'jquery' ), $this->version, false );
+            wp_enqueue_script( $this->plugin_name.'-model', plugin_dir_url( __FILE__ ) . 'js/models/comment.js', array( 'jquery' ), $this->version, false );
+            wp_enqueue_script( $this->plugin_name.'-collection', plugin_dir_url( __FILE__ ) . 'js/collections/comments.js', array( 'jquery' ), $this->version, false );
+            wp_enqueue_script( $this->plugin_name.'-view', plugin_dir_url( __FILE__ ) . 'js/views/comments.js', array( 'jquery' ), $this->version, false );
+            wp_enqueue_script( $this->plugin_name.'-app', plugin_dir_url( __FILE__ ) . 'js/app.js', array( 'jquery' ), $this->version, false );
 
 	}
 

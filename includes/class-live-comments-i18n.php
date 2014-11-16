@@ -9,8 +9,8 @@
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    Live_Comments
+ * @subpackage Live_Comments/includes
  */
 
 /**
@@ -20,11 +20,11 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
- * @author     Your Name <email@example.com>
+ * @package    Live_Comments
+ * @subpackage Live_Comments/includes
+ * @author     Arun Singh <devarun444@gmail.com>
  */
-class Plugin_Name_i18n {
+class Live_Comments_i18n {
 
 	/**
 	 * The domain specified for this plugin.

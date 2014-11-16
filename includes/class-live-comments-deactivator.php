@@ -6,8 +6,8 @@
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    Live_Comments
+ * @subpackage Live_Comments/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
- * @author     Your Name <email@example.com>
+ * @package    Live_Comments
+ * @subpackage Live_Comments/includes
+ * @author     Arun Singh <devarun444@gmail.com>
  */
-class Plugin_Name_Deactivator {
+class Live_Comments_Deactivator {
 
 	/**
 	 * Short Description. (use period)
