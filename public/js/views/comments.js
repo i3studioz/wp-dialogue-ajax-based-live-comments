@@ -1,22 +1,22 @@
 var app = app || {};
 var $ = jQuery;
 app.CommentView = Backbone.View.extend({
-    el: $('#commentapp'),
+    el: $('#comments'),
     template: _.template($('#comments-template').html()),
     events: {
-        'submit form#commentform' : 'saveComment'
+        'submit form#commentform': 'saveComment'
     },
     initialize: function() {
         _.bindAll(this, 'render', 'saveComment', 'appendItem');
-        
+
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
         this.$email = this.$('#email');
         this.$website = this.$('#url');
-        
+
         this.collection = new app.CommentList();
         this.collection.bind('add', this.appendItem);
-        
+
         this.counter = 0;
         this.render();
     },
@@ -28,24 +28,31 @@ app.CommentView = Backbone.View.extend({
         }, this);
 
     },
-    getAvatarUrl: function($string){
-        return 'http://0.gravatar.com/avatar/'+md5($string)+'/?s=96'; // md5 it later
+    getAvatarUrl: function($string) {
+        return 'http://0.gravatar.com/avatar/' + md5($string) + '/?s=96'; // md5 it later
     },
     getAttributes: function() {
 
         return {
-            comment: this.$comment.val().trim(),
+            comment_id: '',
+            comment_depth: 1,
             author: this.$author.val().trim(),
             email: this.$email.val().trim(),
             website: this.$website.val().trim(),
-            avatar: this.getAvatarUrl(this.$email.val().trim())
+            avatar: this.getAvatarUrl(this.$email.val().trim()),
+            avatar_size: 96,
+            comment_post_link: '',
+            comment_iso_time: '',
+            comment_date: '',
+            comment: this.$comment.val().trim(),
+            maderation_required: true
         };
 
     },
     saveComment: function(e) {
-        
-         e.stopPropagation();
-        
+
+        e.preventDefault();
+
         this.counter++;
         //console.log(this.getAttributes());
         var comment = new app.Comment();

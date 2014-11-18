@@ -22,9 +22,7 @@ if (post_password_required())
             </nav><!-- #comment-nav-above -->
     <?php endif; // check for comment navigation   ?>
 
-        <ol class="comment-list">
-            <?php wp_list_comments(); ?>
-        </ol><!-- .comment-list -->
+        <ol class="comment-list"></ol><!-- .comment-list -->
 
     <?php if (get_comment_pages_count() > 1 && get_option('page_comments')) : // are there comments to navigate through   ?>
             <nav id="comment-nav-below" class="comment-navigation" role="navigation">
@@ -96,7 +94,7 @@ if (post_password_required())
                     <time datetime="<%= comment_iso_time %>"><%= comment_date %></time>
                 </a>
             </div>
-            <p class="comment-awaiting-moderation">Your comment is awaiting moderation.</p>
+            <%= if(maderation_required){ %><p class="comment-awaiting-moderation">Your comment is awaiting moderation.</p> <%= } %>
         </footer>
         <div class="comment-content col-md-10 col-xs-7">
             <p><%= comment %></p>
