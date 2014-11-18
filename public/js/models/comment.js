@@ -10,6 +10,7 @@ app.Comment = Backbone.Model.extend({
         comment : '',
         author  : '',
         email   : '',
+        website : '',
         avatar  : ''
     }
     

@@ -4,7 +4,7 @@ app.CommentView = Backbone.View.extend({
     el: $('#commentapp'),
     template: _.template($('#comments-template').html()),
     events: {
-        'click button#save': 'saveComment'
+        'submit form#commentform' : 'saveComment'
     },
     initialize: function() {
         _.bindAll(this, 'render', 'saveComment', 'appendItem');
@@ -12,6 +12,7 @@ app.CommentView = Backbone.View.extend({
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
         this.$email = this.$('#email');
+        this.$website = this.$('#url');
         
         this.collection = new app.CommentList();
         this.collection.bind('add', this.appendItem);
@@ -28,7 +29,7 @@ app.CommentView = Backbone.View.extend({
 
     },
     getAvatarUrl: function($string){
-        return 'http://www.gravatar.com/avatar/'+md5($string); // md5 it later
+        return 'http://0.gravatar.com/avatar/'+md5($string)+'/?s=96'; // md5 it later
     },
     getAttributes: function() {
 
@@ -36,19 +37,24 @@ app.CommentView = Backbone.View.extend({
             comment: this.$comment.val().trim(),
             author: this.$author.val().trim(),
             email: this.$email.val().trim(),
+            website: this.$website.val().trim(),
             avatar: this.getAvatarUrl(this.$email.val().trim())
         };
 
     },
-    saveComment: function() {
+    saveComment: function(e) {
+        
+         e.stopPropagation();
+        
         this.counter++;
         //console.log(this.getAttributes());
         var comment = new app.Comment();
         comment.set(this.getAttributes());
         this.collection.add(comment);
+        return false;
     },
     appendItem: function(item) {
-        $('ul', this.el).append(this.template(this.getAttributes()));
+        $('ol.comment-list', this.el).append(this.template(this.getAttributes()));
     }
 
 
