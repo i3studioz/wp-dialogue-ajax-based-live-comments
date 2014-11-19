@@ -87,7 +87,8 @@ if (post_password_required())
     <article id="div-comment-<%= comment_id %>" class="comment-body row">
         <footer class="comment-meta">
             <div class="comment-author vcard col-md-2 col-xs-3">
-                <img alt="" src="<%= avatar %>" class="avatar avatar-<%= avatar_size %> photo" height="<%= avatar_size %>" width="<%= avatar_size %>"></div>
+                <%= avatar %>
+            </div>
             <div class="comment-metadata col-md-10 col-xs-7">
                 <cite class="fn"><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a></cite>
                             on <a href="<%= comment_post_link %>">

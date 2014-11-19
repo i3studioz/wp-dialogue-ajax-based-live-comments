@@ -13,8 +13,8 @@ app.CommentView = Backbone.View.extend({
         this.$author = this.$('#author');
         this.$email = this.$('#email');
         this.$website = this.$('#url');
-        this.collection = new app.CommentList();
-        //this.collection = new app.CommentList(app_vars.db_comments);
+        var comments_json = $.parseJSON(app_vars.db_comments);
+        this.collection = new app.CommentList(comments_json);
         this.collection.bind('add', this.appendItem);     
 
         this.counter = 0;
@@ -39,13 +39,13 @@ app.CommentView = Backbone.View.extend({
             author: this.$author.val().trim(),
             email: this.$email.val().trim(),
             website: this.$website.val().trim(),
-            avatar: this.getAvatarUrl(this.$email.val().trim()),
+            avatar: '',
             avatar_size: 96,
             comment_post_link: '',
             comment_iso_time: '',
             comment_date: '',
             comment: this.$comment.val().trim(),
-            maderation_required: true
+            moderation_required: true
         };
 
     },
@@ -61,7 +61,7 @@ app.CommentView = Backbone.View.extend({
         return false;
     },
     appendItem: function(item) {
-        $('ol.comment-list', this.el).append(this.template(this.getAttributes()));
+        $('ol.comment-list', this.el).append(this.template(item.toJSON()));
     }
 
 
