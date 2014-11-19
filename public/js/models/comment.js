@@ -18,7 +18,7 @@ app.Comment = Backbone.Model.extend({
         comment_iso_time : '',
         comment_date : '',
         comment : '',
-        maderation_required : true
+        moderation_required : true
     }
     
 });

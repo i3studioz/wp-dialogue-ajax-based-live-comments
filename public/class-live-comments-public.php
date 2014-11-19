@@ -77,15 +77,30 @@ class Live_Comments_Public {
         wp_enqueue_script($this->plugin_name . '-collection', plugin_dir_url(__FILE__) . 'js/collections/comments.js', array('jquery'), $this->version, true);
         wp_enqueue_script($this->plugin_name . '-view', plugin_dir_url(__FILE__) . 'js/views/comments.js', array('jquery'), $this->version, true);
         wp_enqueue_script($this->plugin_name . '-app', plugin_dir_url(__FILE__) . 'js/app.js', array('jquery'), $this->version, true);
+
+        // Now we can localize the script with our data.
+        $app_vars = array('post_id' => get_the_ID(), 'current_user' => get_current_user_id(), 'ajax_url' => admin_url('admin-ajax.php'), 'db_comments' => $this->lc_get_db_comments());
+        wp_localize_script($this->plugin_name . '-app', 'app_vars', $app_vars);
     }
 
+    /**
+     * override the comments template from live comments comment template
+     * 
+     * @global object $post
+     * @param string $comment_template
+     * @return string
+     */
     public function lc_comments_template($comment_template) {
         global $post;
         if (!( is_singular() && ( have_comments() || 'open' == $post->comment_status ) )) {
             return;
         } else {
-            return plugin_dir_path( __FILE__ ) . 'partials/live-comments-public-display.php';
+            return plugin_dir_path(__FILE__) . 'partials/live-comments-public-display.php';
         }
+    }
+
+    public function lc_get_db_comments() {
+        return "{ comment_id : 1, comment_depth : 1, author  : 'arun', email   : 'devarun444@gmail.com',     website : 'http://devarun444.com', avatar  : ".get_avatar('devarun444@gmail.com').", avatar_size : 96, comment_post_link : 'new/link', comment_iso_time : '5 AM', comment_date : 'Today', comment : 'Hey! Comment found', moderation_required : true }";
     }
 
 }

@@ -6,16 +6,16 @@ app.CommentView = Backbone.View.extend({
     events: {
         'submit form#commentform': 'saveComment'
     },
-    initialize: function() {
+    initialize: function(app_vars) {
         _.bindAll(this, 'render', 'saveComment', 'appendItem');
-
+        
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
         this.$email = this.$('#email');
         this.$website = this.$('#url');
-
         this.collection = new app.CommentList();
-        this.collection.bind('add', this.appendItem);
+        //this.collection = new app.CommentList(app_vars.db_comments);
+        this.collection.bind('add', this.appendItem);     
 
         this.counter = 0;
         this.render();
