@@ -13,7 +13,7 @@ app.CommentView = Backbone.View.extend({
         this.$author = this.$('#author');
         this.$email = this.$('#email');
         this.$website = this.$('#url');
-        var comments_json = $.parseJSON(app_vars.db_comments);
+        var comments_json =  app_vars.db_comments; //$.parseJSON(app_vars.db_comments);
         this.collection = new app.CommentList(comments_json);
         this.collection.bind('add', this.appendItem);     
 
@@ -27,9 +27,6 @@ app.CommentView = Backbone.View.extend({
             self.appendItem(comment);
         }, this);
 
-    },
-    getAvatarUrl: function($string) {
-        return 'http://0.gravatar.com/avatar/' + md5($string) + '/?s=96'; // md5 it later
     },
     getAttributes: function() {
 
@@ -54,7 +51,6 @@ app.CommentView = Backbone.View.extend({
         e.preventDefault();
 
         this.counter++;
-        //console.log(this.getAttributes());
         var comment = new app.Comment();
         comment.set(this.getAttributes());
         this.collection.add(comment);
@@ -63,6 +59,4 @@ app.CommentView = Backbone.View.extend({
     appendItem: function(item) {
         $('ol.comment-list', this.el).append(this.template(item.toJSON()));
     }
-
-
 });
