@@ -8,7 +8,7 @@ app.Comment = Backbone.Model.extend({
     
     defaults: {
         comment_id : '',
-        comment_depth : 1,
+        comment_class : '',
         author  : '',
         email   : '',
         website : '',

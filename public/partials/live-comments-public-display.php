@@ -83,7 +83,7 @@ if (post_password_required())
 
 
 <script type="text/template" id="comments-template">
-    <li id="comment-<%= comment_id %>" class="comment even thread-even depth-<%= comment_depth %>">
+    <li id="comment-<%= comment_id %>" <%= comment_class %>>
     <article id="div-comment-<%= comment_id %>" class="comment-body row">
         <footer class="comment-meta">
             <div class="comment-author vcard col-md-2 col-xs-3">

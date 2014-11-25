@@ -32,7 +32,7 @@ app.CommentView = Backbone.View.extend({
 
         return {
             comment_id: '',
-            comment_depth: 1,
+            comment_class: '',
             author: this.$author.val().trim(),
             email: this.$email.val().trim(),
             website: this.$website.val().trim(),

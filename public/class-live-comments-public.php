@@ -102,6 +102,7 @@ class Live_Comments_Public {
     
     $args = array(
         'post_id' => $post_id,
+        'order' => 'ASC'
     );
     
     $comments = get_comments($args);
@@ -109,7 +110,7 @@ class Live_Comments_Public {
     foreach($comments as $comment){
         $localized_comment[] = array(
             'comment_id' => $comment->comment_ID,
-            'comment_depth' => 1,
+            'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
             'author' => $comment->comment_author,
             'email' => $comment->comment_author_email,
             'website' => $comment->comment_author_url,
