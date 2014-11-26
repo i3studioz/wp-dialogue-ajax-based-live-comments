@@ -95,7 +95,7 @@ if (post_password_required())
                     <time datetime="<%= comment_iso_time %>"><%= comment_date %></time>
                 </a>
             </div>
-            <p class="comment-awaiting-moderation">Your comment is awaiting moderation <%= moderation_required %>.</p>
+            <% if(moderation_required){ %><p class="comment-awaiting-moderation">Your comment is awaiting moderation.</p><% } %>
         </footer>
         <div class="comment-content col-md-10 col-xs-7">
             <p><%= comment %></p>
