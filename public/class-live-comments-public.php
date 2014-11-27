@@ -99,31 +99,61 @@ class Live_Comments_Public {
     }
 
     public function lc_get_db_comments($post_id) {
-    
-    $args = array(
-        'post_id' => $post_id,
-        'order' => 'ASC'
-    );
-    
-    $comments = get_comments($args);
-    $localized_comment = array();
-    foreach($comments as $comment){
-        $localized_comment[] = array(
-            'comment_id' => $comment->comment_ID,
-            'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
-            'author' => $comment->comment_author,
-            'email' => $comment->comment_author_email,
-            'website' => $comment->comment_author_url,
-            'avatar' => get_avatar($comment->comment_author_email, 96),
-            'avatar_size' => 96,
-            'comment_post_link' => esc_url( get_comment_link( $comment->comment_ID ) ),
-            'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
-            'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
-            'comment' => $comment->comment_content,
-            'moderation_required' => !$comment->comment_approved);
+
+        $args = array(
+            'post_id' => $post_id,
+            'order' => 'ASC'
+        );
+
+        $comments = get_comments($args);
+        $localized_comment = array();
+        foreach ($comments as $comment) {
+            $localized_comment[] = array(
+                'comment_id' => $comment->comment_ID,
+                'comment_post_id' => $comment->comment_post_ID,
+                'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
+                'author' => $comment->comment_author,
+                'email' => $comment->comment_author_email,
+                'website' => $comment->comment_author_url,
+                'avatar' => get_avatar($comment->comment_author_email, 96),
+                'avatar_size' => 96,
+                'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
+                'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
+                'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
+                'comment' => $comment->comment_content,
+                'moderation_required' => !$comment->comment_approved);
+        }
+
+        return $localized_comment;
     }
 
-    return $localized_comment;
+    public function lc_get_comment_from_db($comment_id) {
+        
+    }
+
+    public function lc_add_comment_to_db() {
+
+        $time = current_time('mysql');
+
+        $data = array(
+            'comment_post_ID' => $_REQUEST['comment_post_id'],
+            'comment_author' => $_REQUEST['author'],
+            'comment_author_email' => $_REQUEST['email'],
+            'comment_author_url' => $_REQUEST['url'],
+            'comment_content' => $_REQUEST['comment'],
+            'comment_type' => '',
+            'comment_parent' => 0,
+            'user_id' => 1,
+            'comment_author_IP' => '127.0.0.1',
+            'comment_agent' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10 (.NET CLR 3.5.30729)',
+            'comment_date' => $time,
+            'comment_approved' => 1,
+        );
+
+        $comment = wp_insert_comment($data);
+
+        print_r($comment);
+        die();
     }
 
 }

@@ -13,6 +13,7 @@ app.CommentView = Backbone.View.extend({
         this.$author = this.$('#author');
         this.$email = this.$('#email');
         this.$website = this.$('#url');
+        this.$comment_post_ID = this.$('#comment_post_ID');
         var comments_json =  app_vars.db_comments; //$.parseJSON(app_vars.db_comments);
         this.collection = new app.CommentList(comments_json);
         this.collection.bind('add', this.appendItem);     
@@ -32,6 +33,7 @@ app.CommentView = Backbone.View.extend({
 
         return {
             comment_id: '',
+            comment_post_id : this.$comment_post_ID.val().trim(),
             comment_class: '',
             author: this.$author.val().trim(),
             email: this.$email.val().trim(),
@@ -52,7 +54,11 @@ app.CommentView = Backbone.View.extend({
 
         this.counter++;
         var comment = new app.Comment();
-        comment.set(this.getAttributes());
+        //comment.set();
+        comment.save(this.getAttributes(), {success: function(comment){
+                console.log(comment);
+            }        
+        });
         this.collection.add(comment);
         return false;
     },
