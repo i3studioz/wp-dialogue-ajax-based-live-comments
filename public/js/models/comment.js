@@ -1,5 +1,4 @@
 var app = app || {};
-
 // extending backbone model for comments model
 
 app.Comment = Backbone.Model.extend({
@@ -7,7 +6,7 @@ app.Comment = Backbone.Model.extend({
 
     defaults: {
         comment_id: '',
-        comment_post_id : '',
+        comment_post_id: '',
         comment_class: '',
         author: '',
         email: '',
@@ -20,23 +19,17 @@ app.Comment = Backbone.Model.extend({
         comment: '',
         moderation_required: true
     },
+    idAttribute: 'comment_id',
+    actionURL: {
+        'read': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment',
+        'create': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment',
+        'update': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment',
+        'delete': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment'
+    },
     sync: function(method, model, options) {
-        return $.ajax({
-            type: 'POST',
-            contentType: 'application/x-www-form-urlencoded',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-HTTP-Method-Override', 'POST');
-            },
-            //dataType: 'json',
-            //url: '/index?id=' + this.get('id') + '&email=' + this.get('email')
-            url: 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment&author=' + this.get('author') + '&email=' + this.get('email') + '&url=' + this.get('website') + '&comment=' + this.get('comment' + '&comment_post_id=' + this.get('comment_post_id'))
-        }).done(function(data) {
-            alert(data);
-            /*if (console && console.log) {
-                console.log("Sample of data:", data.slice(0, 100));
-            }*/
-        });
+        options = options || {};
+        options.url = model.actionURL[method.toLowerCase()];
+        console.log(method.toLowerCase());
+        return Backbone.sync.apply(this, arguments);
     }
-
-
 });

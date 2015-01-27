@@ -8,15 +8,15 @@ app.CommentView = Backbone.View.extend({
     },
     initialize: function(app_vars) {
         _.bindAll(this, 'render', 'saveComment', 'appendItem');
-        
+
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
         this.$email = this.$('#email');
         this.$website = this.$('#url');
         this.$comment_post_ID = this.$('#comment_post_ID');
-        var comments_json =  app_vars.db_comments; //$.parseJSON(app_vars.db_comments);
+        var comments_json = app_vars.db_comments; //$.parseJSON(app_vars.db_comments);
         this.collection = new app.CommentList(comments_json);
-        this.collection.bind('add', this.appendItem);     
+        this.collection.bind('add', this.appendItem);
 
         this.counter = 0;
         this.render();
@@ -32,8 +32,7 @@ app.CommentView = Backbone.View.extend({
     getAttributes: function() {
 
         return {
-            comment_id: '',
-            comment_post_id : this.$comment_post_ID.val().trim(),
+            comment_post_id: this.$comment_post_ID.val().trim(),
             comment_class: '',
             author: this.$author.val().trim(),
             email: this.$email.val().trim(),
@@ -53,14 +52,19 @@ app.CommentView = Backbone.View.extend({
         e.preventDefault();
 
         this.counter++;
-        var comment = new app.Comment();
-        //comment.set();
-        comment.save(this.getAttributes(), {success: function(comment){
-                console.log(comment);
-            }        
-        });
-        this.collection.add(comment);
-        return false;
+        this.collection.create(
+                this.getAttributes(),
+                {
+                    wait: true,
+                    success: function(model, response) {
+                        console.log(response);
+                        console.log('success');
+                    },
+                    error: function(model, response) {
+                        console.log(response);
+                        console.log('its error');
+                    }});
+
     },
     appendItem: function(item) {
         $('ol.comment-list', this.el).append(this.template(item.toJSON()));
