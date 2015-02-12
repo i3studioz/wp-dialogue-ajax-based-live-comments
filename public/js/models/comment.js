@@ -21,15 +21,15 @@ app.Comment = Backbone.Model.extend({
     },
     idAttribute: 'comment_id',
     actionURL: {
-        'read': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment',
+        'read': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=fetch_comment',
         'create': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment',
         'update': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment',
-        'delete': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment'
+        'delete': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=remove_comment'
     },
     sync: function(method, model, options) {
         options = options || {};
         options.url = model.actionURL[method.toLowerCase()];
-        console.log(method.toLowerCase());
+        //console.log(method.toLowerCase());
         return Backbone.sync.apply(this, arguments);
     }
 });

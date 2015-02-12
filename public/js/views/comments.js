@@ -54,16 +54,8 @@ app.CommentView = Backbone.View.extend({
         this.counter++;
         this.collection.create(
                 this.getAttributes(),
-                {
-                    wait: true,
-                    success: function(model, response) {
-                        console.log(response);
-                        console.log('success');
-                    },
-                    error: function(model, response) {
-                        console.log(response);
-                        console.log('its error');
-                    }});
+                {wait: true}
+        );
 
     },
     appendItem: function(item) {

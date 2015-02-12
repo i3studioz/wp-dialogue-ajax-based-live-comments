@@ -127,23 +127,23 @@ class Live_Comments_Public {
         return $localized_comment;
     }
 
-    public function lc_get_comment_from_db($comment_id, $post_id) {
-        $comment = get_comment($comment_id);
+    public function lc_get_comment_from_db($comment_id) {
+        $comment_vars = get_comment($comment_id);
         //print_r($comment);
         $comment_data = array(
-            'comment_id' => $comment->comment_ID,
-            'comment_post_id' => $comment->comment_post_ID,
-            'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
-            'author' => $comment->comment_author,
-            'email' => $comment->comment_author_email,
-            'website' => $comment->comment_author_url,
-            'avatar' => get_avatar($comment->comment_author_email, 96),
+            'comment_id' => $comment_vars->comment_ID,
+            'comment_post_id' => $comment_vars->comment_post_ID,
+            'comment_class' => comment_class('', $comment_vars->comment_ID, $comment_vars->comment_post_ID, false),
+            'author' => $comment_vars->comment_author,
+            'email' => $comment_vars->comment_author_email,
+            'website' => $comment_vars->comment_author_url,
+            'avatar' => get_avatar($comment_vars->comment_author_email, 96),
             'avatar_size' => 96,
-            'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
-            'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
-            'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
-            'comment' => $comment->comment_content,
-            'moderation_required' => !$comment->comment_approved
+            'comment_post_link' => esc_url(get_comment_link($comment_vars->comment_ID)),
+            'comment_iso_time' => get_comment_date('c', $comment_vars->comment_ID),
+            'comment_date' => get_comment_date('d F Y', $comment_vars->comment_ID),
+            'comment' => $comment_vars->comment_content,
+            'moderation_required' => !$comment_vars->comment_approved
         );
 
         return $comment_data;
@@ -151,33 +151,35 @@ class Live_Comments_Public {
 
     public function lc_add_comment_to_db() {
 
-//        $time = current_time('mysql');
-//
-//        $post_vars = json_decode(file_get_contents("php://input"), true);
-//        $data = array(
-//            'comment_post_ID' => $post_vars['comment_post_id'],
-//            'comment_author' => $post_vars['author'],
-//            'comment_author_email' => $post_vars['email'],
-//            'comment_author_url' => $post_vars['url'],
-//            'comment_content' => $post_vars['comment'],
-//            'comment_type' => '',
-//            'comment_parent' => 0,
-//            'user_id' => 1,
-//            'comment_author_IP' => '127.0.0.1',
-//            'comment_agent' => $_SERVER['HTTP_USER_AGENT'],
-//            'comment_date' => $time,
-//            'comment_approved' => 1,
-//        );
-//
-//        $comment = wp_insert_comment($data);
-//        //print_r($comment);
-//        $comment_data = array();
-//        if($comment){
-//            $comment_data = $this->lc_get_comment_from_db($comment, $post_vars['comment_post_id']);
-//        }
-//        wp_send_json($comment_data);
+        $time = current_time('mysql');
+
+        $post_vars = json_decode(file_get_contents("php://input"), true);
+        $data = array(
+            'comment_post_ID' => $post_vars['comment_post_id'],
+            'comment_author' => $post_vars['author'],
+            'comment_author_email' => $post_vars['email'],
+            'comment_author_url' => $post_vars['website'],
+            'comment_content' => $post_vars['comment'],
+            'comment_type' => '',
+            'comment_parent' => 0,
+            'user_id' => 1,
+            'comment_author_IP' => '127.0.0.1',
+            'comment_agent' => $_SERVER['HTTP_USER_AGENT'],
+            'comment_date' => $time,
+            'comment_approved' => 1,
+        );
+
+        $comment_id = wp_insert_comment($data);
+        //print_r($comment);
+        $comment_data = array();
+        if($comment_id){
+            $comment_data = $this->lc_get_comment_from_db($comment_id);
+        }
+        //wp_send_json($comment_data);
         
-        echo "0";
+        echo json_encode($comment_data);
+        
+        die();
 
     }
 
