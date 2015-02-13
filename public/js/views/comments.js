@@ -62,7 +62,7 @@ app.CommentView = Backbone.View.extend({
                 {
                     wait: true,
                     success: function(model, response) {
-                        console.log(response);
+                        //console.log(response);
                         if (response.error.length > 0) {
                             $('<div/>').addClass("alert alert-danger")
                                     .html(response.error)
