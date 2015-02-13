@@ -11,6 +11,7 @@ app.CommentView = Backbone.View.extend({
 
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
+        this.$parent = this.$('#comment_parent');
         this.$email = this.$('#email');
         this.$website = this.$('#url');
         this.$comment_post_ID = this.$('#comment_post_ID');
@@ -33,6 +34,7 @@ app.CommentView = Backbone.View.extend({
 
         return {
             comment_post_id: this.$comment_post_ID.val().trim(),
+            comment_parent: this.$parent.val().trim(),
             comment_class: '',
             author: this.$author.val().trim(),
             email: this.$email.val().trim(),
@@ -43,7 +45,8 @@ app.CommentView = Backbone.View.extend({
             comment_iso_time: '',
             comment_date: '',
             comment: this.$comment.val().trim(),
-            moderation_required: true
+            moderation_required: true,
+            reply_link : ''
         };
 
     },
@@ -52,9 +55,17 @@ app.CommentView = Backbone.View.extend({
         e.preventDefault();
 
         this.counter++;
-        this.collection.create(
-                this.getAttributes(),
-                {wait: true}
+        
+        var self = this;
+        var new_comment = new app.Comment();
+        new_comment.save(this.getAttributes(),
+        {
+            wait: true,
+            success:function(model, response){
+                console.log(response);
+                self.collection.add(new_comment);
+            }
+        }
         );
 
     },

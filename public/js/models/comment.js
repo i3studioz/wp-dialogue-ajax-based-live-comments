@@ -6,6 +6,7 @@ app.Comment = Backbone.Model.extend({
 
     defaults: {
         comment_id: '',
+        comment_parent: 0,
         comment_post_id: '',
         comment_class: '',
         author: '',
@@ -17,7 +18,8 @@ app.Comment = Backbone.Model.extend({
         comment_iso_time: '',
         comment_date: '',
         comment: '',
-        moderation_required: true
+        moderation_required: true,
+        reply_link : ''
     },
     idAttribute: 'comment_id',
     actionURL: {

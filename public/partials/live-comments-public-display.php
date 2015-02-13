@@ -95,11 +95,12 @@ if (post_password_required())
                     <time datetime="<%= comment_iso_time %>"><%= comment_date %></time>
                 </a>
             </div>
-            <% if(moderation_required){ %><p class="comment-awaiting-moderation">Your comment is awaiting moderation.</p><% } %>
+            <% if(moderation_required){ %><p class="comment-awaiting-moderation"><?php _e('Your comment is awaiting moderation.', 'live-comments'); ?></p><% } %>
         </footer>
         <div class="comment-content col-md-10 col-xs-7">
             <p><%= comment %></p>
         </div>
-        <div class="reply"><a class="comment-reply-link" href="" onclick="">Reply</a></div></article>
+        <%= reply_link %>
+        </article>
     </li>
 </script>
