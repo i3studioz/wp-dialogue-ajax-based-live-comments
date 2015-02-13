@@ -46,7 +46,7 @@ app.CommentView = Backbone.View.extend({
             comment_date: '',
             comment: this.$comment.val().trim(),
             moderation_required: true,
-            reply_link : ''
+            reply_link: ''
         };
 
     },
@@ -55,17 +55,29 @@ app.CommentView = Backbone.View.extend({
         e.preventDefault();
 
         this.counter++;
-        
+
         var self = this;
         var new_comment = new app.Comment();
         new_comment.save(this.getAttributes(),
-        {
-            wait: true,
-            success:function(model, response){
-                console.log(response);
-                self.collection.add(new_comment);
-            }
-        }
+                {
+                    wait: true,
+                    success: function(model, response) {
+                        console.log(response);
+                        if (response.error.length > 0) {
+                            $('<div/>').addClass("alert alert-danger")
+                                    .html(response.error)
+                                    .prependTo($("#respond"))
+                                    .hide()
+                                    .fadeIn(1000)
+                                    .delay(3000)
+                                    .fadeOut(function() {
+                                        $(this).remove()
+                                    });
+                        } else {
+                            self.collection.add(new_comment);
+                        }
+                    }
+                }
         );
 
     },
