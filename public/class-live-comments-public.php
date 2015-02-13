@@ -112,6 +112,7 @@ class Live_Comments_Public {
                 (
                 'comment_id' => $comment->comment_ID,
                 'comment_post_id' => $comment->comment_post_ID,
+                'comment_parent' => $comment->comment_parent,
                 'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
                 'author' => $comment->comment_author,
                 'email' => $comment->comment_author_email,
@@ -123,7 +124,7 @@ class Live_Comments_Public {
                 'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
                 'comment' => $comment->comment_content,
                 'moderation_required' => !$comment->comment_approved,
-                'reply_link' => get_comment_reply_link(array('add_below' => 'comment-'.$comment->comment_ID, 'depth' => 1, 'max_depth'  => 5), $comment->comment_ID, $comment->comment_post_ID)
+                'reply_link' => get_comment_reply_link(array('add_below' => 'comment-'.$comment->comment_ID, 'depth' => 1, 'max_depth'  => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
             );
         }
 
@@ -316,6 +317,7 @@ class Live_Comments_Public {
         $comment_data = array(
             'comment_id' => $comment->comment_ID,
             'comment_post_id' => $comment->comment_post_ID,
+            'comment_parent' => $comment->comment_parent,
             'comment_class' => comment_class('', $comment->comment_ID, $comment->comment_post_ID, false),
             'author' => $comment->comment_author,
             'email' => $comment->comment_author_email,
@@ -327,7 +329,7 @@ class Live_Comments_Public {
             'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
             'comment' => $comment->comment_content,
             'moderation_required' => !$comment->comment_approved,
-            'reply_link' => get_comment_reply_link(array('add_below' => 'comment-'.$comment->comment_ID, 'depth' => 1, 'max_depth'  => 5), $comment->comment_ID, $comment->comment_post_ID)
+            'reply_link' => get_comment_reply_link(array('add_below' => 'comment-'.$comment->comment_ID, 'depth' => 1, 'max_depth'  => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
         );
 
         /**

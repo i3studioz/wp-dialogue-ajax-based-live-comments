@@ -102,5 +102,6 @@ if (post_password_required())
         </div>
         <%= reply_link %>
         </article>
+        <ol class="children"></ol>
     </li>
 </script>
