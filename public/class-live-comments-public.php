@@ -391,5 +391,20 @@ class Live_Comments_Public {
             return $this->lc_get_comment_depth($parent, $count);
         }
     }
+    /**
+     * Add required hidden fields for logged in users
+     */
+    function lc_logged_user_hidden_fields(){
+        global $current_user;
+        //print_r($current_user);
+
+
+
+        $fields = '';
+        $fields .= '<input type="hidden" value="'.$current_user->display_name.'" id="author" />';
+        $fields .= '<input type="hidden" value="'.$current_user->user_email.'" id="email" />';
+        $fields .= '<input type="hidden" value="'.$current_user->user_url.'" id="url" />';
+        echo $fields;
+    }
 
 }

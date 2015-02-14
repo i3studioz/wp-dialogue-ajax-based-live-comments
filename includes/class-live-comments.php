@@ -172,6 +172,9 @@ class Live_Comments {
 
         $this->loader->add_action('wp_ajax_add_comment', $plugin_public, 'lc_add_comment_to_db');
         $this->loader->add_action('wp_ajax_nopriv_add_comment', $plugin_public, 'lc_add_comment_to_db');
+        // add more fields for logged in users
+        
+        $this->loader->add_action( 'comment_form_logged_in_after', $plugin_public, 'lc_logged_user_hidden_fields' );
     }
 
     /**
