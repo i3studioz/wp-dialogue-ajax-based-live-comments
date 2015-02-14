@@ -74,7 +74,9 @@ app.CommentView = Backbone.View.extend({
                                         $(this).remove()
                                     });
                         } else {
-                            self.collection.add(new_comment);
+                            var comment_json = new_comment.toJSON();
+                            self.collection.add(comment_json);
+                            window.location.hash = 'comment-'+comment_json.comment_id;
                         }
                     }
                 }
@@ -84,7 +86,7 @@ app.CommentView = Backbone.View.extend({
     appendItem: function(item) {
         item_json = item.toJSON();
         console.log(item_json);
-        if (item_json.comment_parent != 0) {
+        if (item_json.comment_parent != 0 && $('#comment-'+item_json.comment_parent).length > 0) {
             $('#comment-'+item_json.comment_parent+' > ol.children', this.el).append(this.template(item_json));
         } else {
             $('ol.comment-list', this.el).append(this.template(item_json));

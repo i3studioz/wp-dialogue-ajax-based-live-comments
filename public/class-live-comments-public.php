@@ -70,12 +70,13 @@ class Live_Comments_Public {
     public function enqueue_scripts() {
 
         wp_enqueue_script('jquery');
+        wp_enqueue_script('comment-reply');
         wp_enqueue_script('underscore');
         wp_enqueue_script('backbone');
-        wp_enqueue_script($this->plugin_name . '-model', plugin_dir_url(__FILE__) . 'js/models/comment.js', array('jquery'), $this->version, true);
-        wp_enqueue_script($this->plugin_name . '-collection', plugin_dir_url(__FILE__) . 'js/collections/comments.js', array('jquery'), $this->version, true);
-        wp_enqueue_script($this->plugin_name . '-view', plugin_dir_url(__FILE__) . 'js/views/comments.js', array('jquery'), $this->version, true);
-        wp_enqueue_script($this->plugin_name . '-app', plugin_dir_url(__FILE__) . 'js/app.js', array('jquery'), $this->version, true);
+        wp_enqueue_script($this->plugin_name . '-model', plugin_dir_url(__FILE__) . 'js/models/comment.js', array('jquery', 'comment-reply'), $this->version, true);
+        wp_enqueue_script($this->plugin_name . '-collection', plugin_dir_url(__FILE__) . 'js/collections/comments.js', array('jquery', 'comment-reply'), $this->version, true);
+        wp_enqueue_script($this->plugin_name . '-view', plugin_dir_url(__FILE__) . 'js/views/comments.js', array('jquery', 'comment-reply'), $this->version, true);
+        wp_enqueue_script($this->plugin_name . '-app', plugin_dir_url(__FILE__) . 'js/app.js', array('jquery', 'comment-reply'), $this->version, true);
 
         // Now we can localize the script with our data.
         $app_vars = array('post_id' => get_the_ID(), 'current_user' => get_current_user_id(), 'ajax_url' => admin_url('admin-ajax.php'), 'db_comments' => $this->lc_get_db_comments(get_the_ID()));
@@ -99,33 +100,35 @@ class Live_Comments_Public {
     }
 
     public function lc_get_db_comments($post_id) {
-
+        global $comment_depth;
         $args = array(
             'post_id' => $post_id,
             'order' => 'ASC'
         );
-
         $comments = get_comments($args);
         $localized_comment = array();
         foreach ($comments as $comment) {
-            $localized_comment[] = array
-                (
-                'comment_id' => $comment->comment_ID,
-                'comment_post_id' => $comment->comment_post_ID,
-                'comment_parent' => $comment->comment_parent,
-                'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
-                'author' => $comment->comment_author,
-                'email' => $comment->comment_author_email,
-                'website' => $comment->comment_author_url,
-                'avatar' => get_avatar($comment->comment_author_email, 96),
-                'avatar_size' => 96,
-                'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
-                'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
-                'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
-                'comment' => $comment->comment_content,
-                'moderation_required' => !$comment->comment_approved,
-                'reply_link' => get_comment_reply_link(array('add_below' => 'comment-'.$comment->comment_ID, 'depth' => 1, 'max_depth'  => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
-            );
+            if ($comment->comment_approved != 'spam') {
+                $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
+                $localized_comment[] = array
+                    (
+                    'comment_id' => $comment->comment_ID,
+                    'comment_post_id' => $comment->comment_post_ID,
+                    'comment_parent' => $comment->comment_parent,
+                    'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
+                    'author' => $comment->comment_author,
+                    'email' => $comment->comment_author_email,
+                    'website' => $comment->comment_author_url,
+                    'avatar' => get_avatar($comment->comment_author_email, 96),
+                    'avatar_size' => 96,
+                    'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
+                    'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
+                    'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
+                    'comment' => $comment->comment_content,
+                    'moderation_required' => !$comment->comment_approved,
+                    'reply_link' => get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
+                );
+            }
         }
 
         return $localized_comment;
@@ -154,7 +157,7 @@ class Live_Comments_Public {
     }
 
     public function lc_add_comment_to_db() {
-
+        global $comment_depth;
         $time = current_time('mysql');
         $post_vars = json_decode(file_get_contents("php://input"), true);
 ############################### Temp Comment ###################################
@@ -262,7 +265,7 @@ class Live_Comments_Public {
         $user = wp_get_current_user();
         if ($user->exists()) {
             if (empty($user->display_name))
-            $user->display_name = $user->user_login;
+                $user->display_name = $user->user_login;
             $comment_author = wp_slash($user->display_name);
             $comment_author_email = wp_slash($user->user_email);
             $comment_author_url = wp_slash($user->user_url);
@@ -313,24 +316,26 @@ class Live_Comments_Public {
         }
 
         $comment = get_comment($comment_id);
-
-        $comment_data = array(
-            'comment_id' => $comment->comment_ID,
-            'comment_post_id' => $comment->comment_post_ID,
-            'comment_parent' => $comment->comment_parent,
-            'comment_class' => comment_class('', $comment->comment_ID, $comment->comment_post_ID, false),
-            'author' => $comment->comment_author,
-            'email' => $comment->comment_author_email,
-            'website' => $comment->comment_author_url,
-            'avatar' => get_avatar($comment->comment_author_email, 96),
-            'avatar_size' => 96,
-            'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
-            'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
-            'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
-            'comment' => $comment->comment_content,
-            'moderation_required' => !$comment->comment_approved,
-            'reply_link' => get_comment_reply_link(array('add_below' => 'comment-'.$comment->comment_ID, 'depth' => 1, 'max_depth'  => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
-        );
+        if ($comment->comment_approved != 'spam') {
+            $comment_depth = $this->lc_get_comment_depth($comment_id);
+            $comment_data = array(
+                'comment_id' => $comment->comment_ID,
+                'comment_post_id' => $comment->comment_post_ID,
+                'comment_parent' => $comment->comment_parent,
+                'comment_class' => comment_class('', $comment->comment_ID, $comment->comment_post_ID, false),
+                'author' => $comment->comment_author,
+                'email' => $comment->comment_author_email,
+                'website' => $comment->comment_author_url,
+                'avatar' => get_avatar($comment->comment_author_email, 96),
+                'avatar_size' => 96,
+                'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
+                'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
+                'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
+                'comment' => $comment->comment_content,
+                'moderation_required' => !$comment->comment_approved,
+                'reply_link' => get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
+            );
+        }
 
         /**
          * Perform other actions when comment cookies are set.
@@ -367,6 +372,24 @@ class Live_Comments_Public {
         echo json_encode($comment_data);
 
         die();
+    }
+
+    /**
+     * 
+     * @global reference $wpdb
+     * @param int $comment_id
+     * @return type
+     */
+    function lc_get_comment_depth($comment_id, $count = 1) {
+        global $wpdb;
+        $parent = $wpdb->get_var("SELECT comment_parent FROM $wpdb->comments WHERE comment_ID = '$comment_id'");
+        //$count = 0;
+        if ($parent == 0) {
+            return $count;
+        } else {
+            $count += 1;
+            return $this->lc_get_comment_depth($parent, $count);
+        }
     }
 
 }
