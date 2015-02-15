@@ -90,7 +90,7 @@ if (post_password_required())
                 <%= avatar %>
             </div>
             <div class="comment-metadata col-md-10 col-xs-7">
-                <cite class="fn"><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a></cite>
+                <cite class="fn"><% if(website){ %><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a><% } else { %><%= author %><% } %></cite>
                             on <a href="<%= comment_post_link %>">
                     <time datetime="<%= comment_iso_time %>"><%= comment_date %></time>
                 </a>
