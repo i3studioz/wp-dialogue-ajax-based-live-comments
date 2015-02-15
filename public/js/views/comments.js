@@ -7,7 +7,7 @@ app.CommentView = Backbone.View.extend({
         'submit form#commentform': 'saveComment'
     },
     initialize: function(app_vars) {
-        _.bindAll(this, 'render', 'saveComment', 'appendItem');
+        _.bindAll(this, 'render', 'saveComment', 'appendItem', 'getLiveComments');
 
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
@@ -20,6 +20,10 @@ app.CommentView = Backbone.View.extend({
         this.collection.bind('add', this.appendItem);
 
         this.counter = 0;
+        var self = this;
+        setInterval(function() {
+            self.getLiveComments();
+        }, 3000);
         this.render();
     },
     render: function() {
@@ -28,6 +32,23 @@ app.CommentView = Backbone.View.extend({
         _(this.collection.models).each(function(comment) {
             self.appendItem(comment);
         }, this);
+
+    },
+    getLiveComments: function(start_id) {
+        //console.log('here');
+        var self = this;
+        this.collection.fetch({
+            success: function(collection, response) {
+                self.getLastModel();
+            },
+            error: function(collection, response) {
+                console.log(response);
+            }
+        });
+    },
+    getLastModel: function() {
+        var last_model = this.collection.first();
+        console.log(last_model);
 
     },
     getAttributes: function() {
@@ -76,7 +97,7 @@ app.CommentView = Backbone.View.extend({
                         } else {
                             var comment_json = new_comment.toJSON();
                             self.collection.add(comment_json);
-                            window.location.hash = 'comment-'+comment_json.comment_id;
+                            window.location.hash = 'comment-' + comment_json.comment_id;
                         }
                     }
                 }
@@ -85,11 +106,11 @@ app.CommentView = Backbone.View.extend({
     },
     appendItem: function(item) {
         item_json = item.toJSON();
-        console.log(item_json);
-        if (item_json.comment_parent != 0 && $('#comment-'+item_json.comment_parent).length > 0) {
-            $('#comment-'+item_json.comment_parent+' > ol.children', this.el).append(this.template(item_json));
+        //console.log(item_json);
+        if (item_json.comment_parent != 0 && $('#comment-' + item_json.comment_parent).length > 0) {
+            $('#comment-' + item_json.comment_parent + ' > ol.children', this.el).append(this.template(item_json));
         } else {
-            $('ol.comment-list', this.el).append(this.template(item_json));
+            $('ol.comment-list', this.el).prepend(this.template(item_json));
         }
     }
 });

@@ -167,11 +167,17 @@ class Live_Comments {
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
         $this->loader->add_filter('comments_template', $plugin_public, 'lc_comments_template');
+        $this->loader->add_filter('wp_head', $plugin_public, 'lc_global_js_vars');
 
         // save comment ajax action
 
         $this->loader->add_action('wp_ajax_add_comment', $plugin_public, 'lc_add_comment_to_db');
         $this->loader->add_action('wp_ajax_nopriv_add_comment', $plugin_public, 'lc_add_comment_to_db');
+        
+        // fetch comments from db
+
+        $this->loader->add_action('wp_ajax_fetch_comment', $plugin_public, 'lc_get_db_comments');
+        $this->loader->add_action('wp_ajax_nopriv_fetch_comment', $plugin_public, 'lc_get_db_comments');
         // add more fields for logged in users
         
         $this->loader->add_action( 'comment_form_logged_in_after', $plugin_public, 'lc_logged_user_hidden_fields' );

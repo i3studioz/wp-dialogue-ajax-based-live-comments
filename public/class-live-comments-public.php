@@ -79,7 +79,7 @@ class Live_Comments_Public {
         wp_enqueue_script($this->plugin_name . '-app', plugin_dir_url(__FILE__) . 'js/app.js', array('jquery', 'comment-reply'), $this->version, true);
 
         // Now we can localize the script with our data.
-        $app_vars = array('post_id' => get_the_ID(), 'current_user' => get_current_user_id(), 'ajax_url' => admin_url('admin-ajax.php'), 'db_comments' => $this->lc_get_db_comments(get_the_ID()));
+        $app_vars = array('db_comments' => $this->lc_get_db_comments(get_the_ID(), 0, false));
         wp_localize_script($this->plugin_name . '-app', 'app_vars', $app_vars);
     }
 
@@ -99,12 +99,30 @@ class Live_Comments_Public {
         }
     }
 
-    public function lc_get_db_comments($post_id) {
-        global $comment_depth;
+    public function lc_get_db_comments($post_id = 0, $start_id = 0, $doing_ajax = true) {
+        global $comment_depth; //, $post;
+        if ($post_id == 0 && isset($_GET['post_id']))
+            $post_id = $_GET['post_id'];
+
         $args = array(
             'post_id' => $post_id,
             'order' => 'ASC'
         );
+
+        if (isset($_GET['type'])) {
+            switch ($_GET['type']) {
+                case 'newer':
+                    $args['date_query'] = array('after' => $_GET['new_start']);
+
+                    break;
+                case 'older':
+                    $args['date_query'] = array('before' => strtotime($_GET['old_start']));
+                    break;
+
+                default:
+                    //$args['date_query'] = array('before' => strtotime($_GET['new_start']));
+            }
+        }
         $comments = get_comments($args);
         $localized_comment = array();
         foreach ($comments as $comment) {
@@ -130,8 +148,12 @@ class Live_Comments_Public {
                 );
             }
         }
-
-        return $localized_comment;
+        if ($doing_ajax) {
+            echo json_encode($localized_comment);
+            die();
+        } else {
+            return $localized_comment;
+        }
     }
 
     public function lc_get_comment_from_db($comment_id) {
@@ -391,20 +413,37 @@ class Live_Comments_Public {
             return $this->lc_get_comment_depth($parent, $count);
         }
     }
+
     /**
      * Add required hidden fields for logged in users
      */
-    function lc_logged_user_hidden_fields(){
+    function lc_logged_user_hidden_fields() {
         global $current_user;
         //print_r($current_user);
 
 
 
         $fields = '';
-        $fields .= '<input type="hidden" value="'.$current_user->display_name.'" id="author" />';
-        $fields .= '<input type="hidden" value="'.$current_user->user_email.'" id="email" />';
-        $fields .= '<input type="hidden" value="'.$current_user->user_url.'" id="url" />';
+        $fields .= '<input type="hidden" value="' . $current_user->display_name . '" id="author" />';
+        $fields .= '<input type="hidden" value="' . $current_user->user_email . '" id="email" />';
+        $fields .= '<input type="hidden" value="' . $current_user->user_url . '" id="url" />';
         echo $fields;
+    }
+
+    /**
+     * Global JavaScript object vatiables used by the app
+     */
+    function lc_global_js_vars() {
+        global $wpdb, $current_user;
+        $post_id = get_the_ID();
+        $new_start = $wpdb->get_var("SELECT comment_date from $wpdb->comments WHERE comment_post_ID = '$post_id' AND comment_ID = (SELECT MAX(comment_ID) from $wpdb->comments)");
+        $old_start = $wpdb->get_var("SELECT comment_date from $wpdb->comments WHERE comment_post_ID = '$post_id' AND comment_ID = (SELECT MIN(comment_ID) from $wpdb->comments)");
+        //print_r($new_start);
+        echo '<script type="text/javascript">
+             /* <![CDATA[ */
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'current_user' => $current_user->ID, 'ajax_url' => admin_url('admin-ajax.php'), 'new_start' => $new_start, 'old_start' => $old_start)) .
+        '/* ]]> */
+            </script>';
     }
 
 }
