@@ -100,7 +100,9 @@ class Live_Comments_Public {
     }
 
     public function lc_get_db_comments($post_id = 0, $start_id = 0, $doing_ajax = true) {
-        global $comment_depth; //, $post;
+        global $comment_depth, $current_user; //, $post;
+        $commenter = wp_get_current_commenter();
+        //print_r($commenter);
         if ($post_id == 0 && isset($_GET['post_id']))
             $post_id = $_GET['post_id'];
 
@@ -109,7 +111,6 @@ class Live_Comments_Public {
             'order' => 'ASC',
             'status' => 'approve'
         );
-
         if (isset($_GET['type'])) {
             switch ($_GET['type']) {
                 case 'newer':
@@ -124,10 +125,13 @@ class Live_Comments_Public {
                 //$args['date_query'] = array('before' => strtotime($_GET['new_start']));
             }
         }
+        
         $comments = get_comments($args);
         $localized_comment = array();
         foreach ($comments as $comment) {
-            if ($comment->comment_approved != 'spam') {
+            if ($doing_ajax && ($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)) {
+                continue;
+            }
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
                 $localized_comment[] = array
                     (
@@ -148,7 +152,6 @@ class Live_Comments_Public {
                     'moderation_required' => !$comment->comment_approved,
                     'reply_link' => get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
                 );
-            }
         }
         if ($doing_ajax) {
             echo json_encode($localized_comment);

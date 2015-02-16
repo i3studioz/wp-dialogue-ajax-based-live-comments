@@ -17,7 +17,7 @@ app.CommentList = Backbone.Collection.extend({
 
         switch (method) {
             case 'read':
-                console.log(read_start);
+                //console.log(read_start);
                 return 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=fetch_comment&post_id=' + read_post + '&read_start=' + read_start + '&type=' + read_type;
 
         }

@@ -20,8 +20,6 @@ app.CommentView = Backbone.View.extend({
         var comments_json = app_vars.db_comments; //$.parseJSON(app_vars.db_comments);
         this.collection = new app.CommentList(comments_json);
         this.collection.bind('add', this.appendItem);
-        //this.collection.read_start = lc_vars.new_start_time;
-        //this.collection.read_post = lc_vars.post_id;
         this.collection.meta('read_start', lc_vars.new_start_time);
         this.collection.meta('read_post', lc_vars.post_id);
         this.collection.meta('new_start', lc_vars.new_start);
@@ -31,7 +29,7 @@ app.CommentView = Backbone.View.extend({
         var self = this;
         setInterval(function () {
             self.getLiveComments();
-        }, 3000);
+        }, 10000);
 
         this.$queued = {};
 
@@ -151,5 +149,7 @@ app.CommentView = Backbone.View.extend({
         var newest = self.getNewestModel();
         this.collection.meta('read_start', newest.get('comment_date'));
         this.collection.meta('new_start', newest.get('comment_id'));
+        
+        $('#new-comment-stat').html('');
     }
 });
