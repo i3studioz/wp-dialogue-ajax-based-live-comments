@@ -64,7 +64,7 @@ if (post_password_required())
                 <div class="nav-next"><?php next_comments_link(__('Newer Comments &rarr;', 'live-comments')); ?></div>
             </nav><!-- #comment-nav-above -->
         <?php endif; // check for comment navigation   ?>
-
+            <a href="javascript:;" id="new-comment-stat"></a>
         <ol class="comment-list"></ol><!-- .comment-list -->
 
         <?php if (get_comment_pages_count() > 1 && get_option('page_comments')) : // are there comments to navigate through   ?>
@@ -90,7 +90,7 @@ if (post_password_required())
     <div class="comment-metadata col-md-10 col-xs-7">
     <cite class="fn"><% if(website){ %><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a><% } else { %><%= author %><% } %></cite>
     on <a href="<%= comment_post_link %>">
-    <time datetime="<%= comment_iso_time %>"><%= comment_date %></time>
+    <time datetime="<%= comment_iso_time %>"><%= comment_date_readable %></time>
     </a>
     </div>
     <% if(moderation_required){ %><p class="comment-awaiting-moderation"><?php _e('Your comment is awaiting moderation.', 'live-comments'); ?></p><% } %>
@@ -102,4 +102,8 @@ if (post_password_required())
     </article>
     <ol class="children"></ol>
     </li>
+</script>
+
+<script type="text/template" id="new-comments">
+    <% if(count > 0){ %><span><%= count %> new comments</span><% } %>
 </script>

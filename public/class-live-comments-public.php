@@ -106,21 +106,22 @@ class Live_Comments_Public {
 
         $args = array(
             'post_id' => $post_id,
-            'order' => 'ASC'
+            'order' => 'ASC',
+            'status' => 'approve'
         );
 
         if (isset($_GET['type'])) {
             switch ($_GET['type']) {
                 case 'newer':
-                    $args['date_query'] = array('after' => $_GET['new_start']);
+                    $args['date_query'] = array('after' => $_GET['read_start']);
 
                     break;
                 case 'older':
-                    $args['date_query'] = array('before' => strtotime($_GET['old_start']));
+                    $args['date_query'] = array('before' => strtotime($_GET['read_start']));
                     break;
 
                 default:
-                    //$args['date_query'] = array('before' => strtotime($_GET['new_start']));
+                //$args['date_query'] = array('before' => strtotime($_GET['new_start']));
             }
         }
         $comments = get_comments($args);
@@ -140,8 +141,9 @@ class Live_Comments_Public {
                     'avatar' => get_avatar($comment->comment_author_email, 96),
                     'avatar_size' => 96,
                     'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
-                    'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
-                    'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
+                    'comment_iso_time' => date('c', strtotime($comment->comment_date)),
+                    'comment_date' => $comment->comment_date,
+                    'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
                     'comment' => $comment->comment_content,
                     'moderation_required' => !$comment->comment_approved,
                     'reply_link' => get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
@@ -351,8 +353,9 @@ class Live_Comments_Public {
                 'avatar' => get_avatar($comment->comment_author_email, 96),
                 'avatar_size' => 96,
                 'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
-                'comment_iso_time' => get_comment_date('c', $comment->comment_ID),
-                'comment_date' => get_comment_date('d F Y', $comment->comment_ID),
+                'comment_iso_time' => date('c', strtotime($comment->comment_date)),
+                'comment_date' => $comment->comment_date,
+                'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
                 'comment' => $comment->comment_content,
                 'moderation_required' => !$comment->comment_approved,
                 'reply_link' => get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
@@ -436,12 +439,14 @@ class Live_Comments_Public {
     function lc_global_js_vars() {
         global $wpdb, $current_user;
         $post_id = get_the_ID();
-        $new_start = $wpdb->get_var("SELECT comment_date from $wpdb->comments WHERE comment_post_ID = '$post_id' AND comment_ID = (SELECT MAX(comment_ID) from $wpdb->comments)");
-        $old_start = $wpdb->get_var("SELECT comment_date from $wpdb->comments WHERE comment_post_ID = '$post_id' AND comment_ID = (SELECT MIN(comment_ID) from $wpdb->comments)");
+        $new_start = $wpdb->get_var("SELECT MAX(comment_ID) from $wpdb->comments WHERE comment_post_ID = '$post_id' AND comment_approved = 1");
+        $old_start = $wpdb->get_var("SELECT MIN(comment_ID) from $wpdb->comments WHERE comment_post_ID = '$post_id' AND comment_approved = 1");
+        $new_start_time = $wpdb->get_var("SELECT comment_date from $wpdb->comments  WHERE comment_ID = '$new_start'");
+        $old_start_time = $wpdb->get_var("SELECT comment_date from $wpdb->comments WHERE comment_ID = '$old_start'");
         //print_r($new_start);
         echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'current_user' => $current_user->ID, 'ajax_url' => admin_url('admin-ajax.php'), 'new_start' => $new_start, 'old_start' => $old_start)) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'current_user' => $current_user->ID, 'ajax_url' => admin_url('admin-ajax.php'), 'new_start' => $new_start, 'old_start' => $old_start, 'new_start_time' => $new_start_time, 'old_start_time' => $old_start_time, 'new_item_color' => '#F57C00')) .
         '/* ]]> */
             </script>';
     }

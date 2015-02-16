@@ -17,6 +17,7 @@ app.Comment = Backbone.Model.extend({
         comment_post_link: '',
         comment_iso_time: '',
         comment_date: '',
+        comment_date_readable: '',
         comment: '',
         moderation_required: true,
         reply_link : ''
