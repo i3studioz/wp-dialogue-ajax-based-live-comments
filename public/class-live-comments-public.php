@@ -122,36 +122,42 @@ class Live_Comments_Public {
                     break;
 
                 default:
-                //$args['date_query'] = array('before' => strtotime($_GET['new_start']));
+                    $args['date_query'] = array('after' => strtotime($_GET['read_start']));
             }
         }
-        
+
         $comments = get_comments($args);
         $localized_comment = array();
         foreach ($comments as $comment) {
             if ($doing_ajax && ($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)) {
                 continue;
             }
+
+            $comment_array = array
+                (
+                'comment_id' => $comment->comment_ID,
+                'comment_post_id' => $comment->comment_post_ID,
+                'comment_parent' => $comment->comment_parent,
+                'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
+                'author' => $comment->comment_author,
+                'email' => $comment->comment_author_email,
+                'website' => $comment->comment_author_url,
+                'avatar' => get_avatar($comment->comment_author_email, 96),
+                'avatar_size' => 96,
+                'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
+                'comment_iso_time' => date('c', strtotime($comment->comment_date)),
+                'comment_date' => $comment->comment_date,
+                'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
+                'comment' => $comment->comment_content,
+                'moderation_required' => !$comment->comment_approved,
+            );
+
+            if (get_option('thread_comments')) {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
-                $localized_comment[] = array
-                    (
-                    'comment_id' => $comment->comment_ID,
-                    'comment_post_id' => $comment->comment_post_ID,
-                    'comment_parent' => $comment->comment_parent,
-                    'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
-                    'author' => $comment->comment_author,
-                    'email' => $comment->comment_author_email,
-                    'website' => $comment->comment_author_url,
-                    'avatar' => get_avatar($comment->comment_author_email, 96),
-                    'avatar_size' => 96,
-                    'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
-                    'comment_iso_time' => date('c', strtotime($comment->comment_date)),
-                    'comment_date' => $comment->comment_date,
-                    'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
-                    'comment' => $comment->comment_content,
-                    'moderation_required' => !$comment->comment_approved,
-                    'reply_link' => get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
-                );
+                $comment_array['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID);
+            }
+            
+            $localized_comment[] = $comment_array;
         }
         if ($doing_ajax) {
             echo json_encode($localized_comment);
@@ -161,51 +167,14 @@ class Live_Comments_Public {
         }
     }
 
-    public function lc_get_comment_from_db($comment_id) {
-        $comment_vars = get_comment($comment_id);
-        //print_r($comment);
-        $comment_data = array(
-            'comment_id' => $comment_vars->comment_ID,
-            'comment_post_id' => $comment_vars->comment_post_ID,
-            'comment_class' => comment_class('', $comment_vars->comment_ID, $comment_vars->comment_post_ID, false),
-            'author' => $comment_vars->comment_author,
-            'email' => $comment_vars->comment_author_email,
-            'website' => $comment_vars->comment_author_url,
-            'avatar' => get_avatar($comment_vars->comment_author_email, 96),
-            'avatar_size' => 96,
-            'comment_post_link' => esc_url(get_comment_link($comment_vars->comment_ID)),
-            'comment_iso_time' => get_comment_date('c', $comment_vars->comment_ID),
-            'comment_date' => get_comment_date('d F Y', $comment_vars->comment_ID),
-            'comment' => $comment_vars->comment_content,
-            'moderation_required' => !$comment_vars->comment_approved
-        );
-
-        return $comment_data;
-    }
-
+    /**
+     * Save comments to database
+     * @global int $comment_depth
+     */
     public function lc_add_comment_to_db() {
         global $comment_depth;
         $time = current_time('mysql');
         $post_vars = json_decode(file_get_contents("php://input"), true);
-############################### Temp Comment ###################################
-//        $data = array(
-//            'comment_post_ID' => $post_vars['comment_post_id'],
-//            'comment_author' => $post_vars['author'],
-//            'comment_author_email' => $post_vars['email'],
-//            'comment_author_url' => $post_vars['website'],
-//            'comment_content' => $post_vars['comment'],
-//            'comment_type' => '',
-//            'comment_parent' => 0,
-//            'user_id' => 1,
-//            'comment_author_IP' => '127.0.0.1',
-//            'comment_agent' => $_SERVER['HTTP_USER_AGENT'],
-//            'comment_date' => $time,
-//            'comment_approved' => 1,
-//        );
-//
-//        $comment_id = wp_insert_comment($data);
-        //print_r($comment);
-########################### Replacing with default comment posting #######################
 
         nocache_headers();
 
@@ -344,7 +313,7 @@ class Live_Comments_Public {
 
         $comment = get_comment($comment_id);
         if ($comment->comment_approved != 'spam') {
-            $comment_depth = $this->lc_get_comment_depth($comment_id);
+            //$comment_depth = $this->lc_get_comment_depth($comment_id);
             $comment_data = array(
                 'comment_id' => $comment->comment_ID,
                 'comment_post_id' => $comment->comment_post_ID,
@@ -360,9 +329,13 @@ class Live_Comments_Public {
                 'comment_date' => $comment->comment_date,
                 'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
                 'comment' => $comment->comment_content,
-                'moderation_required' => !$comment->comment_approved,
-                'reply_link' => get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID)
+                'moderation_required' => !$comment->comment_approved
             );
+
+            if (get_option('thread_comments')) {
+                $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
+                $comment_data['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID);
+            }
         }
 
         /**
@@ -374,28 +347,6 @@ class Live_Comments_Public {
          * @param WP_User $user   User object. The user may not exist.
          */
         do_action('set_comment_cookies', $comment, $user);
-
-//        @todo Check possible solutiond for redirection
-//        
-//        $location = empty($post_vars['redirect_to']) ? get_comment_link($comment_id) : $post_vars['redirect_to'] . '#comment-' . $comment_id;
-//
-//        /**
-//         * Filter the location URI to send the commenter after posting.
-//         *
-//         * @since 2.0.5
-//         *
-//         * @param string $location The 'redirect_to' URI sent via $_POST.
-//         * @param object $comment  Comment object.
-//         */
-//        $location = apply_filters('comment_post_redirect', $location, $comment);
-//
-//        wp_safe_redirect($location);
-########################### Replacing with default comment posting #######################
-//        $comment_data = array();
-//        if ($comment_id) {
-//            $comment_data = $this->lc_get_comment_from_db($comment_id);
-//        }
-//wp_send_json($comment_data);
 
         echo json_encode($comment_data);
 
@@ -449,7 +400,7 @@ class Live_Comments_Public {
         //print_r($new_start);
         echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'current_user' => $current_user->ID, 'ajax_url' => admin_url('admin-ajax.php'), 'new_start' => $new_start, 'old_start' => $old_start, 'new_start_time' => $new_start_time, 'old_start_time' => $old_start_time, 'new_item_color' => '#F57C00')) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'current_user' => $current_user->ID, 'ajax_url' => admin_url('admin-ajax.php'), 'new_start' => $new_start, 'old_start' => $old_start, 'new_start_time' => $new_start_time, 'old_start_time' => $old_start_time, 'new_item_color' => '#F57C00', 'thread_comments' => get_option('thread_comments'))) .
         '/* ]]> */
             </script>';
     }

@@ -96,7 +96,7 @@ app.CommentView = Backbone.View.extend({
                 {
                     wait: true,
                     success: function (model, response) {
-                        //console.log(response);
+                        console.log(response);
                         if (response.error && response.error.length > 0) {
                             $('<div/>').addClass("alert alert-danger")
                                     .html(response.error)
@@ -121,7 +121,7 @@ app.CommentView = Backbone.View.extend({
 
         var item_json = item.toJSON();
         //console.log(item_json);
-        if (item_json.comment_parent != 0 && $('#comment-' + item_json.comment_parent).length > 0) {
+        if (item_json.comment_parent != 0 && $('#comment-' + item_json.comment_parent).length > 0 && lc_vars.thread_comments == 1) {
             $('#comment-' + item_json.comment_parent + ' > ol.children', this.el).append(this.template(item_json));
         } else {
             $('ol.comment-list', this.el).prepend(this.template(item_json));
