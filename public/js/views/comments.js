@@ -72,9 +72,9 @@ app.CommentView = Backbone.View.extend({
                     self.getLiveComments();
                 }, 10000);
                 // console.log(response.length);
-                
-                if(response.length == 0){
-                    $('.comment-navigation .nav-previous').html('No more comments').fadeOut(function(){
+
+                if (response.length == 0) {
+                    $('.comment-navigation .nav-previous').html('No more comments').fadeOut(function () {
                         $(this).remove();
                     })
                 }
@@ -146,14 +146,22 @@ app.CommentView = Backbone.View.extend({
         var type = item_json.position;
         if (item_json.comment_parent != 0 && $('#comment-' + item_json.comment_parent).length > 0 && lc_vars.thread_comments == 1) {
             $('#comment-' + item_json.comment_parent + ' > ol.children', this.el).append(this.template(item_json));
-        //} else if (type == 'old') {
-            
-        } else if (type == 'new'){
+            //} else if (type == 'old') {
+
+        } else if (type == 'new') {
             if (lc_vars.comment_order == 'desc')
                 $('ol.comment-list', this.el).prepend(this.template(item_json));
             else
                 $('ol.comment-list', this.el).append(this.template(item_json));
-        }else{
+
+            var $old_color = $('#comment-' + item_json.comment_id).css('background-color');
+            $('#comment-' + item_json.comment_id).css('background-color', lc_vars.new_item_color);
+            
+            setTimeout(function () {
+                $('#comment-' + item_json.comment_id).css('background-color', $old_color);
+            }, 5000);
+            
+        } else {
             if (lc_vars.comment_order == 'desc')
                 $('ol.comment-list', this.el).append(this.template(item_json));
             else
@@ -178,7 +186,7 @@ app.CommentView = Backbone.View.extend({
         this.collection.meta('read_type', 'newer');
         this.collection.meta('new_start', first.get('comment_date'));
 
-        $('#new-comment-stat').html('');
+        $('#load-new-comments').html('');
     },
     initializePageVars: function () {
         var last = this.collection.min(function (model) {

@@ -59,7 +59,9 @@ class Live_Comments_Public {
      * @since    1.0.0
      */
     public function enqueue_styles() {
-        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/live-comments-public.css', array(), $this->version, 'all');
+        if (is_singular() && comments_open()) {
+            wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/live-comments-public.css', array(), $this->version, 'all');
+        }
     }
 
     /**
@@ -68,19 +70,20 @@ class Live_Comments_Public {
      * @since    1.0.0
      */
     public function enqueue_scripts() {
+        if (is_singular() && comments_open()) {
+            wp_enqueue_script('jquery');
+            wp_enqueue_script('comment-reply');
+            wp_enqueue_script('underscore');
+            wp_enqueue_script('backbone');
+            wp_enqueue_script($this->plugin_name . '-model', plugin_dir_url(__FILE__) . 'js/models/comment.js', array('jquery', 'comment-reply'), $this->version, true);
+            wp_enqueue_script($this->plugin_name . '-collection', plugin_dir_url(__FILE__) . 'js/collections/comments.js', array('jquery', 'comment-reply'), $this->version, true);
+            wp_enqueue_script($this->plugin_name . '-view', plugin_dir_url(__FILE__) . 'js/views/comments.js', array('jquery', 'comment-reply'), $this->version, true);
+            wp_enqueue_script($this->plugin_name . '-app', plugin_dir_url(__FILE__) . 'js/app.js', array('jquery', 'comment-reply'), $this->version, true);
 
-        wp_enqueue_script('jquery');
-        wp_enqueue_script('comment-reply');
-        wp_enqueue_script('underscore');
-        wp_enqueue_script('backbone');
-        wp_enqueue_script($this->plugin_name . '-model', plugin_dir_url(__FILE__) . 'js/models/comment.js', array('jquery', 'comment-reply'), $this->version, true);
-        wp_enqueue_script($this->plugin_name . '-collection', plugin_dir_url(__FILE__) . 'js/collections/comments.js', array('jquery', 'comment-reply'), $this->version, true);
-        wp_enqueue_script($this->plugin_name . '-view', plugin_dir_url(__FILE__) . 'js/views/comments.js', array('jquery', 'comment-reply'), $this->version, true);
-        wp_enqueue_script($this->plugin_name . '-app', plugin_dir_url(__FILE__) . 'js/app.js', array('jquery', 'comment-reply'), $this->version, true);
-
-        // Now we can localize the script with our data.
-        $app_vars = array('db_comments' => $this->lc_get_db_comments(get_the_ID(), 0, false));
-        wp_localize_script($this->plugin_name . '-app', 'app_vars', $app_vars);
+// Now we can localize the script with our data.
+            $app_vars = array('db_comments' => $this->lc_get_db_comments(get_the_ID(), 0, false));
+            wp_localize_script($this->plugin_name . '-app', 'app_vars', $app_vars);
+        }
     }
 
     /**
@@ -102,7 +105,7 @@ class Live_Comments_Public {
     public function lc_get_db_comments($post_id = 0, $start_id = 0, $doing_ajax = true) {
         global $comment_depth, $current_user; //, $post;
         $commenter = wp_get_current_commenter();
-        //print_r($commenter);
+//print_r($commenter);
         if ($post_id == 0 && isset($_GET['post_id']))
             $post_id = $_GET['post_id'];
 
@@ -118,10 +121,10 @@ class Live_Comments_Public {
         if (isset($_GET['type'])) {
             switch ($_GET['type']) {
                 case 'newer':
-                        $args['date_query'] = array('after' => $_GET['new_start']);
+                    $args['date_query'] = array('after' => $_GET['new_start']);
                     break;
                 case 'older':
-                        $args['date_query'] = array('before' => $_GET['old_start']);
+                    $args['date_query'] = array('before' => $_GET['old_start']);
                     break;
 
                 default:
@@ -219,7 +222,7 @@ class Live_Comments_Public {
              * @param int $comment_post_ID Post ID.
              */
             do_action('comment_closed', $comment_post_ID);
-            //wp_die(__('Sorry, comments are closed for this item.'));
+//wp_die(__('Sorry, comments are closed for this item.'));
             echo json_encode(array('error' => 'Sorry, comments are closed for this item.'));
             die();
         } elseif ('trash' == $status) {
@@ -285,7 +288,7 @@ class Live_Comments_Public {
             }
         } else {
             if (get_option('comment_registration') || 'private' == $status) {
-                //wp_die(__('Sorry, you must be logged in to post a comment.'));
+//wp_die(__('Sorry, you must be logged in to post a comment.'));
                 echo json_encode(array('error' => 'Sorry, you must be logged in to post a comment.'));
                 die();
             }
@@ -295,18 +298,18 @@ class Live_Comments_Public {
 
         if (get_option('require_name_email') && !$user->exists()) {
             if (6 > strlen($comment_author_email) || '' == $comment_author) {
-                //wp_die(__('<strong>ERROR</strong>: please fill the required fields (name, email).'));
+//wp_die(__('<strong>ERROR</strong>: please fill the required fields (name, email).'));
                 echo json_encode(array('error' => '<strong>ERROR</strong>: please fill the required fields (name, email).'));
                 die();
             } elseif (!is_email($comment_author_email)) {
-                //wp_die(__('<strong>ERROR</strong>: please enter a valid email address.'));
+//wp_die(__('<strong>ERROR</strong>: please enter a valid email address.'));
                 echo json_encode(array('error' => '<strong>ERROR</strong>: please enter a valid email address.'));
                 die();
             }
         }
 
         if ('' == $comment_content) {
-            //wp_die(__('<strong>ERROR</strong>: please type a comment.'));
+//wp_die(__('<strong>ERROR</strong>: please type a comment.'));
             echo json_encode(array('error' => '<strong>ERROR</strong>: please type a comment.'));
             die();
         }
@@ -317,14 +320,14 @@ class Live_Comments_Public {
 
         $comment_id = wp_new_comment($commentdata);
         if (!$comment_id) {
-            //wp_die(__("<strong>ERROR</strong>: The comment could not be saved. Please try again later."));
+//wp_die(__("<strong>ERROR</strong>: The comment could not be saved. Please try again later."));
             echo json_encode(array('error' => '<strong>ERROR</strong>: The comment could not be saved. Please try again later.'));
             die();
         }
 
         $comment = get_comment($comment_id);
         if ($comment->comment_approved != 'spam') {
-            //$comment_depth = $this->lc_get_comment_depth($comment_id);
+//$comment_depth = $this->lc_get_comment_depth($comment_id);
             $comment_data = array(
                 'comment_id' => $comment->comment_ID,
                 'comment_post_id' => $comment->comment_post_ID,
@@ -374,7 +377,7 @@ class Live_Comments_Public {
     function lc_get_comment_depth($comment_id, $count = 1) {
         global $wpdb;
         $parent = $wpdb->get_var("SELECT comment_parent FROM $wpdb->comments WHERE comment_ID = '$comment_id'");
-        //$count = 0;
+//$count = 0;
         if ($parent == 0) {
             return $count;
         } else {
@@ -388,7 +391,7 @@ class Live_Comments_Public {
      */
     function lc_logged_user_hidden_fields() {
         global $current_user;
-        //print_r($current_user);
+//print_r($current_user);
 
 
 
@@ -404,14 +407,16 @@ class Live_Comments_Public {
      * @global object $current_user
      */
     function lc_global_js_vars() {
-        global $current_user;
-        $post_id = get_the_ID();
-        //print_r($new_start);
-        echo '<script type="text/javascript">
+        if (is_singular() && comments_open()) {
+            global $current_user;
+            $post_id = get_the_ID();
+//print_r($new_start);
+            echo '<script type="text/javascript">
              /* <![CDATA[ */
              var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => '#F57C00', 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'))) .
-        '/* ]]> */
+            '/* ]]> */
             </script>';
+        }
     }
 
 }
