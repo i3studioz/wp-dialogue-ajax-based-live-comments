@@ -108,7 +108,7 @@ class Live_Comments_Public {
 
         $args = array(
             'post_id' => $post_id,
-            'order' => get_option('comment_order'),
+            'order' => 'desc',
             'status' => 'approve'
         );
 
@@ -118,21 +118,14 @@ class Live_Comments_Public {
         if (isset($_GET['type'])) {
             switch ($_GET['type']) {
                 case 'newer':
-                    if (get_option('comment_order') == 'asc')
-                        $args['date_query'] = array('before' => $_GET['read_start']);
-                    else
-                        $args['date_query'] = array('after' => $_GET['read_start']);
-
+                        $args['date_query'] = array('after' => $_GET['new_start']);
                     break;
                 case 'older':
-                    if (get_option('comment_order') == 'asc')
-                        $args['date_query'] = array('after' => $_GET['read_start']);
-                    else
-                        $args['date_query'] = array('before' => $_GET['read_start']);
+                        $args['date_query'] = array('before' => $_GET['old_start']);
                     break;
 
                 default:
-                    $args['date_query'] = array('after' => $_GET['read_start']);
+                    $args['date_query'] = array('after' => $_GET['new_start']);
             }
         }
 
@@ -374,7 +367,7 @@ class Live_Comments_Public {
 
     /**
      * 
-     * @global reference $wpdb
+     * @global object $wpdb
      * @param int $comment_id
      * @return type
      */
@@ -416,7 +409,7 @@ class Live_Comments_Public {
         //print_r($new_start);
         echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'current_user' => $current_user->ID, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => '#F57C00', 'thread_comments' => get_option('thread_comments'), 'comment_page' => get_query_var('cpage'), 'comment_order' => get_option('comment_order'))) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => '#F57C00', 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'))) .
         '/* ]]> */
             </script>';
     }
