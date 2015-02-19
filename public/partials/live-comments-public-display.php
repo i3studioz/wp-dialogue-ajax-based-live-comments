@@ -10,29 +10,24 @@ if (post_password_required())
     if (!comments_open() && '0' != get_comments_number() && post_type_supports(get_post_type(), 'comments')) :
         ?>
         <p class="no-comments"><?php _e('Comments are closed.', 'live-comments'); ?></p>
-    <?php endif; ?>
-
-
-
-    <?php comment_form(); ?>
-    <?php if (have_comments()) : ?>
+        <?php else: ?>
+        <?php comment_form(); ?>
+        <?php //if (have_comments()) :  ?>
         <h2 class="comments-title">
             <?php
             printf(_nx('One thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'comments title', 'live-comments'), number_format_i18n(get_comments_number()), '<span>' . get_the_title() . '</span>');
             ?>
         </h2>
-        <a href="javascript:;" id="new-comment-stat"></a>
+        <a href="javascript:;" id="load-new-comments"></a>
         <ol class="comment-list"></ol><!-- .comment-list -->
 
-        <?php if (get_comment_pages_count() > 1 && get_option('page_comments')) : // are there comments to navigate through   ?>
+        <?php if (get_comment_pages_count() > 1 && get_option('page_comments')) : // are there comments to navigate through    ?>
             <nav id="comment-nav-below" class="comment-navigation" role="navigation">
-                <h1 class="screen-reader-text"><?php _e('Comment navigation', 'live-coments'); ?></h1>
-                <div class="nav-previous"><?php previous_comments_link(__('&larr; Older Comments', 'live-coments')); ?></div>
-                <div class="nav-next"><?php next_comments_link(__('Newer Comments &rarr;', 'live-coments')); ?></div>
+                <a href="javascript:;" class="nav-previous" id="load-old-comments"><?php _e('Older Comments', 'live-coments'); ?></a>
             </nav><!-- #comment-nav-below -->
-        <?php endif; // check for comment navigation   ?>
+        <?php endif; // check for comment navigation    ?>
 
-    <?php endif; // have_comments()   ?>
+    <?php endif; // have_comments()    ?>
 
 </div><!-- #comments -->
 

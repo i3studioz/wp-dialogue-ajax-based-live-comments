@@ -108,28 +108,38 @@ class Live_Comments_Public {
 
         $args = array(
             'post_id' => $post_id,
-            'order' => 'ASC',
+            'order' => get_option('comment_order'),
             'status' => 'approve'
         );
+
+        if (get_option('page_comments') && !(isset($_GET['type']) && $_GET['type'] == 'newer')) {
+            $args['number'] = get_option('comments_per_page');
+        }
         if (isset($_GET['type'])) {
             switch ($_GET['type']) {
                 case 'newer':
-                    $args['date_query'] = array('after' => $_GET['read_start']);
+                    if (get_option('comment_order') == 'asc')
+                        $args['date_query'] = array('before' => $_GET['read_start']);
+                    else
+                        $args['date_query'] = array('after' => $_GET['read_start']);
 
                     break;
                 case 'older':
-                    $args['date_query'] = array('before' => strtotime($_GET['read_start']));
+                    if (get_option('comment_order') == 'asc')
+                        $args['date_query'] = array('after' => $_GET['read_start']);
+                    else
+                        $args['date_query'] = array('before' => $_GET['read_start']);
                     break;
 
                 default:
-                    $args['date_query'] = array('after' => strtotime($_GET['read_start']));
+                    $args['date_query'] = array('after' => $_GET['read_start']);
             }
         }
 
         $comments = get_comments($args);
         $localized_comment = array();
         foreach ($comments as $comment) {
-            if ($doing_ajax && ($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)) {
+            if ($doing_ajax && isset($_GET['type']) && $_GET['type'] == 'newer' && ($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)) {
                 continue;
             }
 
@@ -156,7 +166,15 @@ class Live_Comments_Public {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
                 $comment_array['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID);
             }
-            
+
+            if (isset($_GET['type']) && $_GET['type'] == 'newer') {
+                $comment_array['position'] = 'new';
+            } elseif (isset($_GET['type']) && $_GET['type'] == 'older') {
+                $comment_array['position'] = 'old';
+            } else {
+                $comment_array['position'] = 'initial';
+            }
+
             $localized_comment[] = $comment_array;
         }
         if ($doing_ajax) {
@@ -329,7 +347,8 @@ class Live_Comments_Public {
                 'comment_date' => $comment->comment_date,
                 'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
                 'comment' => $comment->comment_content,
-                'moderation_required' => !$comment->comment_approved
+                'moderation_required' => !$comment->comment_approved,
+                'position' => 'new'
             );
 
             if (get_option('thread_comments')) {
@@ -389,18 +408,15 @@ class Live_Comments_Public {
 
     /**
      * Global JavaScript object vatiables used by the app
+     * @global object $current_user
      */
     function lc_global_js_vars() {
-        global $wpdb, $current_user;
+        global $current_user;
         $post_id = get_the_ID();
-        $new_start = $wpdb->get_var("SELECT MAX(comment_ID) from $wpdb->comments WHERE comment_post_ID = '$post_id' AND comment_approved = 1");
-        $old_start = $wpdb->get_var("SELECT MIN(comment_ID) from $wpdb->comments WHERE comment_post_ID = '$post_id' AND comment_approved = 1");
-        $new_start_time = $wpdb->get_var("SELECT comment_date from $wpdb->comments  WHERE comment_ID = '$new_start'");
-        $old_start_time = $wpdb->get_var("SELECT comment_date from $wpdb->comments WHERE comment_ID = '$old_start'");
         //print_r($new_start);
         echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'current_user' => $current_user->ID, 'ajax_url' => admin_url('admin-ajax.php'), 'new_start' => $new_start, 'old_start' => $old_start, 'new_start_time' => $new_start_time, 'old_start_time' => $old_start_time, 'new_item_color' => '#F57C00', 'thread_comments' => get_option('thread_comments'))) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'current_user' => $current_user->ID, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => '#F57C00', 'thread_comments' => get_option('thread_comments'), 'comment_page' => get_query_var('cpage'), 'comment_order' => get_option('comment_order'))) .
         '/* ]]> */
             </script>';
     }

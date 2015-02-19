@@ -20,7 +20,8 @@ app.Comment = Backbone.Model.extend({
         comment_date_readable: '',
         comment: '',
         moderation_required: true,
-        reply_link : ''
+        reply_link : '',
+        position: ''
     },
     idAttribute: 'comment_id',
     actionURL: {

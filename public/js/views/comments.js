@@ -6,7 +6,8 @@ app.CommentView = Backbone.View.extend({
     new_template: _.template($('#new-comments').html()),
     events: {
         'submit form#commentform': 'saveComment',
-        'click #new-comment-stat': 'addNewComments'
+        'click #load-new-comments': 'addNewComments',
+        'click #load-old-comments': 'addPagedComments'
     },
     initialize: function (app_vars) {
         _.bindAll(this, 'render', 'saveComment', 'appendItem', 'getLiveComments');
@@ -20,18 +21,16 @@ app.CommentView = Backbone.View.extend({
         var comments_json = app_vars.db_comments; //$.parseJSON(app_vars.db_comments);
         this.collection = new app.CommentList(comments_json);
         this.collection.bind('add', this.appendItem);
-        this.collection.meta('read_start', lc_vars.new_start_time);
+        this.initializeLiveVars();
+        this.initializePageVars();
         this.collection.meta('read_post', lc_vars.post_id);
-        this.collection.meta('new_start', lc_vars.new_start);
         this.collection.meta('read_type', 'newer');
 
         this.counter = 0;
         var self = this;
-        setInterval(function () {
+        this.liveLoader = setInterval(function () {
             self.getLiveComments();
-        }, 10000);
-
-        this.$queued = {};
+        }, 3000);
 
         this.render();
     },
@@ -50,7 +49,7 @@ app.CommentView = Backbone.View.extend({
             remove: false,
             silent: true,
             success: function (collection, response) {
-                $('#new-comment-stat').html(self.new_template({count: response.length}))
+                $('#load-new-comments').html(self.new_template({count: response.length}))
                 //console.log(response.length);
             },
             error: function (collection, response) {
@@ -58,9 +57,42 @@ app.CommentView = Backbone.View.extend({
             }
         });
     },
-    getNewestModel: function () {
-        var newest = this.collection.at(this.collection.length - 1);
-        return newest;
+    addPagedComments: function () {
+
+        clearInterval(this.liveLoader);
+
+        this.initializePageVars();
+
+        //console.log(oldest_comment.get('comment_date'));
+        //console.log('here');
+        var self = this;
+        this.collection.fetch({
+            remove: false,
+            success: function (collection, response) {
+                // console.log(response.length);
+            },
+            error: function (collection, response) {
+                console.log(response);
+            }
+        });
+    },
+    getFirstModel: function () {
+        if (lc_vars.comment_order == 'asc') {
+            var first = this.collection.at(0);
+        } else {
+            var first = this.collection.at(this.collection.length - 1);
+        }
+        return first;
+
+    },
+    getLastModel: function () {
+        if (lc_vars.comment_order == 'asc') {
+            var last = this.collection.at(this.collection.length - 1);
+        } else {
+            var last = this.collection.at(0);
+        }
+        
+        return last;
 
     },
     getAttributes: function () {
@@ -80,7 +112,8 @@ app.CommentView = Backbone.View.extend({
             comment_date_readable: '',
             comment: this.$comment.val().trim(),
             moderation_required: true,
-            reply_link: ''
+            reply_link: '',
+            position: ''
         };
 
     },
@@ -117,24 +150,28 @@ app.CommentView = Backbone.View.extend({
         );
 
     },
-    appendItem: function (item, type) {
+    appendItem: function (item) {
 
         var item_json = item.toJSON();
         //console.log(item_json);
+        var type = item_json.position;
         if (item_json.comment_parent != 0 && $('#comment-' + item_json.comment_parent).length > 0 && lc_vars.thread_comments == 1) {
             $('#comment-' + item_json.comment_parent + ' > ol.children', this.el).append(this.template(item_json));
-        } else {
+        } else if (type == 'old') {
+            //lc_vars.comment_default_position == 'append' && 
+            $('ol.comment-list', this.el).append(this.template(item_json));
+        } else if (type == 'new') {
+            //lc_vars.comment_default_position == 'append' && 
             $('ol.comment-list', this.el).prepend(this.template(item_json));
-        }
 
-        if (type != 'undefined' && type == 'new') {
             var $old_border = $('#comment-' + item_json.comment_id).css('border');
             $('#comment-' + item_json.comment_id).css('border', '1px solid ' + lc_vars.new_item_color);
 
             setTimeout(function () {
                 $('#comment-' + item_json.comment_id).css('border', $old_border);
             }, 5000);
-
+        } else {
+            $('ol.comment-list', this.el).append(this.template(item_json));
         }
     },
     addNewComments: function () {
@@ -142,14 +179,23 @@ app.CommentView = Backbone.View.extend({
         _(this.collection.models).each(function (comment) {
             var comment_json = comment.toJSON();
             if (comment_json.comment_id > this.collection.meta('new_start')) {
-                self.appendItem(comment, 'new');
+                self.appendItem(comment);
             }
         }, this);
+        this.initializeLiveVars();
+    },
+    initializeLiveVars: function () {
+        var first = this.getFirstModel();
+        this.collection.meta('read_type', 'newer');
+        this.collection.meta('read_start', first.get('comment_date'));
+        this.collection.meta('new_start', first.get('comment_id'));
 
-        var newest = self.getNewestModel();
-        this.collection.meta('read_start', newest.get('comment_date'));
-        this.collection.meta('new_start', newest.get('comment_id'));
-        
         $('#new-comment-stat').html('');
+    },
+    initializePageVars: function () {
+        var last = this.getLastModel();
+        this.collection.meta('read_type', 'older');
+        this.collection.meta('read_start', last.get('comment_date'));
+        this.collection.meta('old_start', last.get('comment_id'));
     }
 });
