@@ -421,4 +421,76 @@ class Live_Comments_Public {
         }
     }
 
+    /**
+     * Prepare comments markup
+     */
+    /* ####################### EXAMPLE MARKUP ###############################
+
+      <li id="comment-<%= comment_id %>" <%= comment_class %>>
+      <article id="div-comment-<%= comment_id %>" class="comment-body">
+      <footer class="comment-meta">
+      <% if(avatar){ %>
+      <div class="comment-author vcard">
+      <%= avatar %>
+      </div>
+      <% } %>
+      <div class="comment-metadata">
+      <cite class="fn">
+      <% if(website){ %>
+      <a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a>
+      <% } else { %>
+      <%= author %>
+      <% } %>
+      </cite> on
+      <a href="<%= comment_post_link %>">
+      <time datetime="<%= comment_iso_time %>">
+      <%= comment_date_readable %>
+      </time>
+      </a>
+      </div>
+      <% if(moderation_required){ %>
+      <p class="comment-awaiting-moderation">Your comment is awaiting moderation.</p>
+      <% } %>
+      </footer>
+      <div class="comment-content">
+      <p><%= comment %></p>
+      </div>
+      <%= reply_link %>
+      </article>
+      <ol class="children"></ol>
+      </li>
+
+      ############################################################### */
+
+    function lc_comments_markup() {
+        $markup = get_option('lc_comment_markup');
+        $markup = str_replace('{{comment_id}}', '<%= comment_id %>', $markup);
+        $markup = str_replace('{{avatar}}', '<% if(avatar){ %><div class="comment-author vcard"><%= avatar %></div><% } %>', $markup);
+        $markup = str_replace('{{author}}', '<% if(website){ %><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a><% } else { %><%= author %><% } %>', $markup);
+        $markup = str_replace('{{comment_post_link}}', '<%= comment_post_link %>', $markup);
+        $markup = str_replace('{{comment_date}}', '<time datetime="<%= comment_iso_time %>"><%= comment_date_readable %></time>', $markup);
+        $markup = str_replace('{{moderation_message}}', '<% if(moderation_required){ %><p class="comment-awaiting-moderation">' . __('Your comment is awaiting moderation.', $this->plugin_name) . '</p><% } %>', $markup);
+        $markup = str_replace('{{comment}}', '<%= comment %>', $markup);
+        $markup = str_replace('{{reply_link}}', '<%= reply_link %>', $markup);
+        $markup = str_replace('{{children}}', '<ol class="children"></ol>', $markup);
+        $comment_markup = '<script type="text/template" id="comments-template">';
+        $comment_markup .= '<li id="comment-<%= comment_id %>" <%= comment_class %>>';
+        $comment_markup .= $markup;
+        $comment_markup .= '</li>';
+        $comment_markup .= '</script>';
+
+        echo $comment_markup;
+    }
+
+    /**
+     * Prepare new comments notification markup
+     */
+    function lc_new_comments_notification_markup() {
+        $note_markup = '<script type="text/template" id="new-comments">';
+        $note_markup .= '<% if(count > 0){ %>'.  str_replace('{{count}}', '<%= count %>', get_option('lc_new_comments_note')).'<% } %>';
+        $note_markup .= '</script>';
+        
+        echo $note_markup;
+    }
+
 }

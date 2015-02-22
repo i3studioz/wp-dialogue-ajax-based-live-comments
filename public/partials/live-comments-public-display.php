@@ -46,34 +46,3 @@ if (post_password_required())
     <?php endif; // have_comments()       ?>
 
 </div><!-- #comments -->
-
-
-<script type="text/template" id="comments-template">
-    <li id="comment-<%= comment_id %>" <%= comment_class %>>
-    <article id="div-comment-<%= comment_id %>" class="comment-body row">
-    <footer class="comment-meta">
-    <% if(avatar){ %>
-    <div class="comment-author vcard col-md-2 col-xs-3">
-    <%= avatar %>
-    </div>
-    <% } %>
-    <div class="comment-metadata col-md-10 col-xs-7">
-    <cite class="fn"><% if(website){ %><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a><% } else { %><%= author %><% } %></cite>
-    on <a href="<%= comment_post_link %>">
-    <time datetime="<%= comment_iso_time %>"><%= comment_date_readable %></time>
-    </a>
-    </div>
-    <% if(moderation_required){ %><p class="comment-awaiting-moderation"><?php _e('Your comment is awaiting moderation.', 'live-comments'); ?></p><% } %>
-    </footer>
-    <div class="comment-content col-md-10 col-xs-7">
-    <p><%= comment %></p>
-    </div>
-    <%= reply_link %>
-    </article>
-    <ol class="children"></ol>
-    </li>
-</script>
-
-<script type="text/template" id="new-comments">
-    <% if(count > 0){ %><span><%= count %> new comments</span><% } %>
-</script>

@@ -182,6 +182,12 @@ class Live_Comments {
         // add more fields for logged in users
         
         $this->loader->add_action( 'comment_form_logged_in_after', $plugin_public, 'lc_logged_user_hidden_fields' );
+        
+        // embed comments markup in the footer 
+        
+        $this->loader->add_action( 'wp_footer', $plugin_public, 'lc_comments_markup' );
+        
+        $this->loader->add_action( 'wp_footer', $plugin_public, 'lc_new_comments_notification_markup' );
     }
 
     /**
