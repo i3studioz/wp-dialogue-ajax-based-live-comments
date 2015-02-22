@@ -148,8 +148,8 @@ class Live_Comments_Public {
                 'author' => $comment->comment_author,
                 'email' => $comment->comment_author_email,
                 'website' => $comment->comment_author_url,
-                'avatar' => get_avatar($comment->comment_author_email, 96),
-                'avatar_size' => 96,
+                'avatar' => get_avatar($comment->comment_author_email, get_option('lc_avatar_size')),
+                'avatar_size' => get_option('lc_avatar_size'),
                 'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
                 'comment_iso_time' => date('c', strtotime($comment->comment_date)),
                 'comment_date' => $comment->comment_date,
@@ -336,8 +336,8 @@ class Live_Comments_Public {
                 'author' => $comment->comment_author,
                 'email' => $comment->comment_author_email,
                 'website' => $comment->comment_author_url,
-                'avatar' => get_avatar($comment->comment_author_email, 96),
-                'avatar_size' => 96,
+                'avatar' => get_avatar($comment->comment_author_email, get_option('lc_avatar_size')),
+                'avatar_size' => get_option('lc_avatar_size'),
                 'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
                 'comment_iso_time' => date('c', strtotime($comment->comment_date)),
                 'comment_date' => $comment->comment_date,
@@ -410,10 +410,12 @@ class Live_Comments_Public {
         if (is_singular() && comments_open()) {
             global $current_user;
             $post_id = get_the_ID();
+            $interval = get_option('lc_refresh_interval');
+            $highlight_color = get_option('lc_highlight_color');
 //print_r($new_start);
             echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => '#F57C00', 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'))) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval)) .
             '/* ]]> */
             </script>';
         }

@@ -10,24 +10,40 @@ if (post_password_required())
     if (!comments_open() && '0' != get_comments_number() && post_type_supports(get_post_type(), 'comments')) :
         ?>
         <p class="no-comments"><?php _e('Comments are closed.', 'live-comments'); ?></p>
-        <?php else: ?>
-        <?php comment_form(); ?>
-        <?php //if (have_comments()) :  ?>
-        <h2 class="comments-title">
-            <?php
-            printf(_nx('One thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'comments title', 'live-comments'), number_format_i18n(get_comments_number()), '<span>' . get_the_title() . '</span>');
+    <?php else: ?>
+        <?php
+        if (get_option('lc_form_position') == 'top') {
+            comment_form();
             ?>
-        </h2>
-        <a href="javascript:;" id="load-new-comments"></a>
+            <h2 class="comments-title">
+                <?php
+                printf(_nx('One thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'comments title', 'live-comments'), number_format_i18n(get_comments_number()), '<span>' . get_the_title() . '</span>');
+                ?>
+            </h2>
+            <a href="javascript:;" id="load-new-comments"></a>
+        <?php } elseif (get_comment_pages_count() > 1 && get_option('page_comments')) { // are there comments to navigate through
+            ?>
+            <h2 class="comments-title">
+                <?php
+                printf(_nx('One thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'comments title', 'live-comments'), number_format_i18n(get_comments_number()), '<span>' . get_the_title() . '</span>');
+                ?>
+            </h2>
+            <nav id="comment-nav-above" class="comment-navigation" role="navigation">
+                <a href="javascript:;" class="nav-previous" id="load-old-comments"><?php _e('Older Comments', 'live-coments'); ?></a>
+            </nav><!-- #comment-nav-below -->
+        <?php } // check for comment navigation  ?>
         <ol class="comment-list"></ol><!-- .comment-list -->
-
-        <?php if (get_comment_pages_count() > 1 && get_option('page_comments')) : // are there comments to navigate through    ?>
+        <?php
+        if (get_option('lc_form_position') == 'bottom') {
+            echo '<a href="javascript:;" id="load-new-comments"></a>';
+            comment_form();
+        } elseif (get_comment_pages_count() > 1 && get_option('page_comments')) { // are there comments to navigate through
+            ?>
             <nav id="comment-nav-below" class="comment-navigation" role="navigation">
                 <a href="javascript:;" class="nav-previous" id="load-old-comments"><?php _e('Older Comments', 'live-coments'); ?></a>
             </nav><!-- #comment-nav-below -->
-        <?php endif; // check for comment navigation    ?>
-
-    <?php endif; // have_comments()    ?>
+        <?php } // check for comment navigation ?>
+    <?php endif; // have_comments()       ?>
 
 </div><!-- #comments -->
 
@@ -36,9 +52,11 @@ if (post_password_required())
     <li id="comment-<%= comment_id %>" <%= comment_class %>>
     <article id="div-comment-<%= comment_id %>" class="comment-body row">
     <footer class="comment-meta">
+    <% if(avatar){ %>
     <div class="comment-author vcard col-md-2 col-xs-3">
     <%= avatar %>
     </div>
+    <% } %>
     <div class="comment-metadata col-md-10 col-xs-7">
     <cite class="fn"><% if(website){ %><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a><% } else { %><%= author %><% } %></cite>
     on <a href="<%= comment_post_link %>">

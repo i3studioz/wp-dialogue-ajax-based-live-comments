@@ -30,7 +30,7 @@ app.CommentView = Backbone.View.extend({
         var self = this;
         this.liveLoader = setInterval(function () {
             self.getLiveComments();
-        }, 10000);
+        }, lc_vars.refresh_interval);
 
         this.render();
     },
@@ -70,7 +70,7 @@ app.CommentView = Backbone.View.extend({
                 self.initializeLiveVars();
                 self.liveLoader = setInterval(function () {
                     self.getLiveComments();
-                }, 10000);
+                }, lc_vars.refresh_interval);
                 // console.log(response.length);
 
                 if (response.length == 0) {
@@ -118,7 +118,7 @@ app.CommentView = Backbone.View.extend({
                 {
                     wait: true,
                     success: function (model, response) {
-                        console.log(response);
+                        //console.log(response);
                         if (response.error && response.error.length > 0) {
                             $('<div/>').addClass("alert alert-danger")
                                     .html(response.error)
@@ -133,6 +133,7 @@ app.CommentView = Backbone.View.extend({
                             var comment_json = new_comment.toJSON();
                             self.collection.add(comment_json);
                             window.location.hash = 'comment-' + comment_json.comment_id;
+                            $('#commentform').get(0).reset();
                         }
                     }
                 }
@@ -159,7 +160,7 @@ app.CommentView = Backbone.View.extend({
             
             setTimeout(function () {
                 $('#comment-' + item_json.comment_id).css('background-color', $old_color);
-            }, 5000);
+            }, 2000);
             
         } else {
             if (lc_vars.comment_order == 'desc')
