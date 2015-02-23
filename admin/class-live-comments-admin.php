@@ -111,7 +111,7 @@ class Live_Comments_Admin {
         );
 
         add_settings_field(
-                'lc_form_position', __('Comment Form Position', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_form_position', 'type' => 'radio', 'options' => array('top' => 'Above Comments', 'bottom' => 'Below Comments'))
+                'lc_form_position', __('Comment Form Position', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_form_position', 'type' => 'radio', 'options' => array('top' => __('Above Comments', $this->plugin_name), 'bottom' => __('Below Comments', $this->plugin_name)))
         );
 
         add_settings_field(
@@ -121,6 +121,11 @@ class Live_Comments_Admin {
 
         add_settings_field(
                 'lc_highlight_color', __('New Comment Highlight Color', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_highlight_color', 'type' => 'color')
+        );
+        
+        add_settings_field(
+                'lc_no_more', __('No More Comments Message', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_no_more', 'type' => 'text', 'description' => __('Message text for no more coments.', $this->plugin_name)
+                )
         );
         
         add_settings_field(
@@ -150,6 +155,8 @@ class Live_Comments_Admin {
         register_setting('discussion', 'lc_refresh_interval');
 
         register_setting('discussion', 'lc_highlight_color');
+        
+        register_setting('discussion', 'lc_no_more');
         
         register_setting('discussion', 'lc_comment_markup');
         

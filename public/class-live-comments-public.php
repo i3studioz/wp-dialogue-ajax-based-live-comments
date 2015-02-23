@@ -223,7 +223,7 @@ class Live_Comments_Public {
              */
             do_action('comment_closed', $comment_post_ID);
 //wp_die(__('Sorry, comments are closed for this item.'));
-            echo json_encode(array('error' => 'Sorry, comments are closed for this item.'));
+            echo json_encode(array('error' => __('Sorry, comments are closed for this item.', $this->plugin_name)));
             die();
         } elseif ('trash' == $status) {
             /**
@@ -270,6 +270,7 @@ class Live_Comments_Public {
         $comment_author_email = ( isset($post_vars['email']) ) ? trim($post_vars['email']) : null;
         $comment_author_url = ( isset($post_vars['website']) ) ? trim($post_vars['website']) : null;
         $comment_content = ( isset($post_vars['comment']) ) ? trim($post_vars['comment']) : null;
+        
 
 // If the user is logged in
         $user = wp_get_current_user();
@@ -289,7 +290,7 @@ class Live_Comments_Public {
         } else {
             if (get_option('comment_registration') || 'private' == $status) {
 //wp_die(__('Sorry, you must be logged in to post a comment.'));
-                echo json_encode(array('error' => 'Sorry, you must be logged in to post a comment.'));
+                echo json_encode(array('error' => __('Sorry, you must be logged in to post a comment.', $this->plugin_name)));
                 die();
             }
         }
@@ -299,29 +300,38 @@ class Live_Comments_Public {
         if (get_option('require_name_email') && !$user->exists()) {
             if (6 > strlen($comment_author_email) || '' == $comment_author) {
 //wp_die(__('<strong>ERROR</strong>: please fill the required fields (name, email).'));
-                echo json_encode(array('error' => '<strong>ERROR</strong>: please fill the required fields (name, email).'));
+                echo json_encode(array('error' => __('<strong>ERROR</strong>: please fill the required fields (name, email).', $this->plugin_name)));
                 die();
             } elseif (!is_email($comment_author_email)) {
 //wp_die(__('<strong>ERROR</strong>: please enter a valid email address.'));
-                echo json_encode(array('error' => '<strong>ERROR</strong>: please enter a valid email address.'));
+                echo json_encode(array('error' => __('<strong>ERROR</strong>: please enter a valid email address.', $this->plugin_name)));
                 die();
             }
         }
 
         if ('' == $comment_content) {
 //wp_die(__('<strong>ERROR</strong>: please type a comment.'));
-            echo json_encode(array('error' => '<strong>ERROR</strong>: please type a comment.'));
+            echo json_encode(array('error' => __('<strong>ERROR</strong>: please type a comment.', $this->plugin_name)));
             die();
         }
 
         $comment_parent = isset($post_vars['comment_parent']) ? absint($post_vars['comment_parent']) : 0;
 
         $commentdata = compact('comment_post_ID', 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_type', 'comment_parent', 'user_ID');
+        
+        $commentdata['comment_date']     = current_time('mysql');
+	$commentdata['comment_date_gmt'] = current_time('mysql', 1);
+        $commentdata['comment_author_IP'] = preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] );
+        $commentdata['comment_agent']     = isset( $_SERVER['HTTP_USER_AGENT'] ) ? substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 ) : '';
+        
+        $commentdata = wp_filter_comment($commentdata);
 
-        $comment_id = wp_new_comment($commentdata);
+	$commentdata['comment_approved'] = wp_allow_comment($commentdata);
+        //echo wp_allow_comment($commentdata); die();
+        $comment_id = wp_insert_comment($commentdata);
         if (!$comment_id) {
 //wp_die(__("<strong>ERROR</strong>: The comment could not be saved. Please try again later."));
-            echo json_encode(array('error' => '<strong>ERROR</strong>: The comment could not be saved. Please try again later.'));
+            echo json_encode(array('error' => __('<strong>ERROR</strong>: The comment could not be saved. Please try again later.', $this->plugin_name)));
             die();
         }
 
@@ -412,10 +422,11 @@ class Live_Comments_Public {
             $post_id = get_the_ID();
             $interval = get_option('lc_refresh_interval');
             $highlight_color = get_option('lc_highlight_color');
+            $no_more = get_option('lc_no_more');
 //print_r($new_start);
             echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval)) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval, 'no_more_text' => __($no_more, $this->plugin_name))) .
             '/* ]]> */
             </script>';
         }
@@ -465,7 +476,7 @@ class Live_Comments_Public {
     function lc_comments_markup() {
         $markup = get_option('lc_comment_markup');
         $markup = str_replace('{{comment_id}}', '<%= comment_id %>', $markup);
-        $markup = str_replace('{{avatar}}', '<% if(avatar){ %><div class="comment-author vcard"><%= avatar %></div><% } %>', $markup);
+        $markup = str_replace('{{avatar}}', '<% if(avatar){ %><%= avatar %><% } %>', $markup);
         $markup = str_replace('{{author}}', '<% if(website){ %><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a><% } else { %><%= author %><% } %>', $markup);
         $markup = str_replace('{{comment_post_link}}', '<%= comment_post_link %>', $markup);
         $markup = str_replace('{{comment_date}}', '<time datetime="<%= comment_iso_time %>"><%= comment_date_readable %></time>', $markup);
@@ -487,10 +498,14 @@ class Live_Comments_Public {
      */
     function lc_new_comments_notification_markup() {
         $note_markup = '<script type="text/template" id="new-comments">';
-        $note_markup .= '<% if(count > 0){ %>'.  str_replace('{{count}}', '<%= count %>', get_option('lc_new_comments_note')).'<% } %>';
+        $note_markup .= '<% if(count > 0){ %>' . str_replace('{{count}}', '<%= count %>', get_option('lc_new_comments_note')) . '<% } %>';
         $note_markup .= '</script>';
-        
+
         echo $note_markup;
     }
+
+    /**
+     * ######## Copied from wp-includes/comment.php
+     */
 
 }

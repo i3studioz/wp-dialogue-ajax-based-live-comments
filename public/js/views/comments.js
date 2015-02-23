@@ -67,20 +67,18 @@ app.CommentView = Backbone.View.extend({
         this.collection.fetch({
             remove: false,
             success: function (collection, response) {
-                self.initializeLiveVars();
-                self.liveLoader = setInterval(function () {
-                    self.getLiveComments();
-                }, lc_vars.refresh_interval);
-                // console.log(response.length);
 
+                // console.log(response.length);
+                self.restartLiveFetch();
                 if (response.length == 0) {
-                    $('.comment-navigation .nav-previous').html('No more comments').fadeOut(function () {
+                    $('.comment-navigation .nav-previous').html(lc_vars.no_more_text).fadeOut(function () {
                         $(this).remove();
                     })
                 }
             },
             error: function (collection, response) {
-                console.log(response);
+                self.restartLiveFetch();
+                //console.log(response);
             }
         });
     },
@@ -108,6 +106,7 @@ app.CommentView = Backbone.View.extend({
     },
     saveComment: function (e) {
 
+        clearInterval(this.liveLoader);
         e.preventDefault();
 
         this.counter++;
@@ -135,10 +134,32 @@ app.CommentView = Backbone.View.extend({
                             window.location.hash = 'comment-' + comment_json.comment_id;
                             $('#commentform').get(0).reset();
                         }
+                        self.restartLiveFetch();
+                    },
+                    error: function (model, response) {
+
+                        $('<div/>').addClass("alert alert-danger")
+                                .html(response.responseText)
+                                .prependTo($("#respond"))
+                                .hide()
+                                .fadeIn(1000)
+                                .delay(3000)
+                                .fadeOut(function () {
+                                    $(this).remove()
+                                });
+                        self.restartLiveFetch();
+                        //console.log(response.responseText);
                     }
                 }
         );
 
+    },
+    restartLiveFetch: function () {
+        var self = this;
+        self.initializeLiveVars();
+        self.liveLoader = setInterval(function () {
+            self.getLiveComments();
+        }, lc_vars.refresh_interval);
     },
     appendItem: function (item) {
 
@@ -157,11 +178,11 @@ app.CommentView = Backbone.View.extend({
 
             var $old_color = $('#comment-' + item_json.comment_id).css('background-color');
             $('#comment-' + item_json.comment_id).css('background-color', lc_vars.new_item_color);
-            
+
             setTimeout(function () {
                 $('#comment-' + item_json.comment_id).css('background-color', $old_color);
             }, 2000);
-            
+
         } else {
             if (lc_vars.comment_order == 'desc')
                 $('ol.comment-list', this.el).append(this.template(item_json));
