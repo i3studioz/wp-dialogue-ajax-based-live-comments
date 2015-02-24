@@ -4,13 +4,14 @@ app.CommentView = Backbone.View.extend({
     el: $('#comments'),
     template: _.template($('#comments-template').html()),
     new_template: _.template($('#new-comments').html()),
+    comment_section_header: _.template($('#comments-header').html()),
     events: {
         'submit form#commentform': 'saveComment',
         'click #load-new-comments': 'addNewComments',
         'click #load-old-comments': 'addPagedComments'
     },
     initialize: function (app_vars) {
-        _.bindAll(this, 'render', 'saveComment', 'appendItem', 'getLiveComments');
+        _.bindAll(this, 'render', 'saveComment', 'appendItem', 'getLiveComments', 'updateCommentHeader');
 
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
@@ -21,8 +22,11 @@ app.CommentView = Backbone.View.extend({
         var comments_json = app_vars.db_comments; //$.parseJSON(app_vars.db_comments);
         this.collection = new app.CommentList(comments_json);
         this.collection.bind('add', this.appendItem);
+        this.collection.bind('add', this.updateCommentHeader);
+        this.collection.meta('total_comments', lc_vars.initial_count);
         this.initializeLiveVars();
         this.initializePageVars();
+        this.updateCommentHeader();
         this.collection.meta('read_post', lc_vars.post_id);
         this.collection.meta('read_type', 'newer');
 
@@ -49,7 +53,7 @@ app.CommentView = Backbone.View.extend({
             remove: false,
             silent: true,
             success: function (collection, response) {
-                $('#load-new-comments').html(self.new_template({count: response.length}))
+                $('#load-new-comments').html(self.new_template({count: response.length}));
                 //console.log(response.length);
             },
             error: function (collection, response) {
@@ -130,6 +134,7 @@ app.CommentView = Backbone.View.extend({
                                     });
                         } else {
                             var comment_json = new_comment.toJSON();
+                            self.collection.meta('total_comments', parseInt(self.collection.meta('total_comments')) + 1);
                             self.collection.add(comment_json);
                             window.location.hash = 'comment-' + comment_json.comment_id;
                             $('#commentform').get(0).reset();
@@ -190,14 +195,20 @@ app.CommentView = Backbone.View.extend({
                 $('ol.comment-list', this.el).prepend(this.template(item_json));
         }
     },
+    updateCommentHeader: function () {
+        //comment_section_header
+        $('h2.comments-title').html(this.comment_section_header({count: this.collection.meta('total_comments')}));
+    },
     addNewComments: function () {
         var self = this;
         _(this.collection.models).each(function (comment) {
             var comment_json = comment.toJSON();
-            if (comment_json.position == 'new') {
+            if (comment_json.comment_id > this.collection.meta('max_id')) {
                 self.appendItem(comment);
+                self.collection.meta('total_comments', parseInt(self.collection.meta('total_comments')) + 1);
             }
         }, this);
+        this.updateCommentHeader();
         this.initializeLiveVars();
     },
     initializeLiveVars: function () {
@@ -207,6 +218,7 @@ app.CommentView = Backbone.View.extend({
         //console.log(first);
         this.collection.meta('read_type', 'newer');
         this.collection.meta('new_start', first.get('comment_date'));
+        this.collection.meta('max_id', first.get('comment_id'));
 
         $('#load-new-comments').html('');
     },

@@ -122,29 +122,36 @@ class Live_Comments_Admin {
         add_settings_field(
                 'lc_highlight_color', __('New Comment Highlight Color', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_highlight_color', 'type' => 'color')
         );
-        
+
         add_settings_field(
                 'lc_no_more', __('No More Comments Message', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_no_more', 'type' => 'text', 'description' => __('Message text for no more coments.', $this->plugin_name)
                 )
         );
-        
+
         add_settings_field(
                 'lc_comment_markup', __('Comment Markup', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_comment_markup', 'type' => 'textarea', 'description' => __('Configure the markup for individual comments to be displayed on front end. Click <a href="javascript:;" class="pop-up">here</a> to see available placeholders. <div class="toggle"><h3>Available Placeholders</h2>'
-                    .'<p><strong>{{comment_id}} || </strong><span class="description">ID for the comment</span></p>'
-                    .'<p><strong>{{avatar}} || </strong><span class="description">Comment author\'s gravatar</span></p>'
-                    .'<p><strong>{{author}} || </strong><span class="description">Author\'s name with link</span></p>'
-                    .'<p><strong>{{comment_post_link}} || </strong><span class="description">Link for the post</span></p>'
-                    .'<p><strong>{{comment_date}} || </strong><span class="description">Date of comment</span></p>'
-                    .'<p><strong>{{moderation_message}} || </strong><span class="description">Message for unapproved comments</span></p>'
-                    .'<p><strong>{{comment}} || </strong><span class="description">Comment Text</span></p>'
-                    .'<p><strong>{{reply_link}} || </strong><span class="description">Reply link for the comment</span></p>'
-                    .'<p><strong>{{children}} || </strong><span class="description">Children comments, works only if threaded comments enabled.</span></p>'
+                    . '<p><strong>{{comment_id}} || </strong><span class="description">ID for the comment</span></p>'
+                    . '<p><strong>{{avatar}} || </strong><span class="description">Comment author\'s gravatar</span></p>'
+                    . '<p><strong>{{author}} || </strong><span class="description">Author\'s name with link</span></p>'
+                    . '<p><strong>{{comment_post_link}} || </strong><span class="description">Link for the post</span></p>'
+                    . '<p><strong>{{comment_date}} || </strong><span class="description">Date of comment</span></p>'
+                    . '<p><strong>{{moderation_message}} || </strong><span class="description">Message for unapproved comments</span></p>'
+                    . '<p><strong>{{comment}} || </strong><span class="description">Comment Text</span></p>'
+                    . '<p><strong>{{reply_link}} || </strong><span class="description">Reply link for the comment</span></p>'
+                    . '<p><strong>{{children}} || </strong><span class="description">Children comments, works only if threaded comments enabled.</span></p>'
                     . '</div>', $this->plugin_name))
         );
-        
+
         add_settings_field(
                 'lc_new_comments_note', __('New Comments Notification Markup', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_new_comments_note', 'type' => 'textarea', 'description' => __('Configure the markup for new comments notification displayed on front end. Click <a href="javascript:;" class="pop-up">here</a> to see available placeholders. <div class="toggle"><h3>Available Placeholders</h2>'
-                    .'<p><strong>{{count}} || </strong><span class="description">Count of new comments.</span></p>'
+                    . '<p><strong>{{count}} || </strong><span class="description">Count of new comments.</span></p>'
+                    . '</div>', $this->plugin_name))
+        );
+
+        add_settings_field(
+                'lc_comment_section_header', __('Comment Section Header', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_comment_section_header', 'type' => 'textarea', 'description' => __('Configure the markup for comments section header displayed on front end. Click <a href="javascript:;" class="pop-up">here</a> to see available placeholders. <div class="toggle"><h3>Available Placeholders</h2>'
+                    . '<p><strong>{{count}} || </strong><span class="description">Count of comments.</span></p>'
+                    . '<p><strong>{{post_name}} || </strong><span class="description">Name of curently viewed post.</span></p>'
                     . '</div>', $this->plugin_name))
         );
         // Finally, we register the fields with WordPress
@@ -155,12 +162,14 @@ class Live_Comments_Admin {
         register_setting('discussion', 'lc_refresh_interval');
 
         register_setting('discussion', 'lc_highlight_color');
-        
+
         register_setting('discussion', 'lc_no_more');
-        
+
         register_setting('discussion', 'lc_comment_markup');
-        
+
         register_setting('discussion', 'lc_new_comments_note');
+
+        register_setting('discussion', 'lc_comment_section_header');
     }
 
     function lc_discussion_options() {
@@ -196,10 +205,10 @@ class Live_Comments_Admin {
                 $html .= '<input type="text" class="color-field" id="' . $args['name'] . '" name="' . $args['name'] . '" value="' . get_option($args['name']) . '" />';
                 //$html .= '<label for="' . $args['name'] . '"> ' . $args['description'] . '</label>';
                 break;
-            
+
             case 'textarea':
-                $html .= '<p><label for="' . $args['name'] . '"> ' . isset($args['description'])?$args['description']:'' . '</label></p>';
-                $html .= '<p><textarea cols="50" rows="10" class="large-text code" id="' . $args['name'] . '" name="' . $args['name'] . '">'.get_option($args['name']).'</textarea></p>';
+                $html .= '<p><label for="' . $args['name'] . '"> ' . isset($args['description']) ? $args['description'] : '' . '</label></p>';
+                $html .= '<p><textarea cols="50" rows="10" class="large-text code" id="' . $args['name'] . '" name="' . $args['name'] . '">' . get_option($args['name']) . '</textarea></p>';
                 break;
 
             default:

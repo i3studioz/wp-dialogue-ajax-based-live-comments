@@ -188,6 +188,7 @@ class Live_Comments {
         $this->loader->add_action( 'wp_footer', $plugin_public, 'lc_comments_markup' );
         
         $this->loader->add_action( 'wp_footer', $plugin_public, 'lc_new_comments_notification_markup' );
+        $this->loader->add_action( 'wp_footer', $plugin_public, 'lc_comment_section_header' );
     }
 
     /**

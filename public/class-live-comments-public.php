@@ -423,10 +423,11 @@ class Live_Comments_Public {
             $interval = get_option('lc_refresh_interval');
             $highlight_color = get_option('lc_highlight_color');
             $no_more = get_option('lc_no_more');
+            $total_comment = get_comments_number();
 //print_r($new_start);
             echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval, 'no_more_text' => __($no_more, $this->plugin_name))) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval, 'no_more_text' => __($no_more, $this->plugin_name), 'initial_count' => $total_comment)) .
             '/* ]]> */
             </script>';
         }
@@ -505,7 +506,18 @@ class Live_Comments_Public {
     }
 
     /**
-     * ######## Copied from wp-includes/comment.php
+     * Prepare new comments notification markup
      */
+    function lc_comment_section_header() {
+        
+        $markup = get_option('lc_comment_section_header');
+        $markup = '<% if(count > 0){ %>' . str_replace('{{count}}', '<%= count %>', $markup) . '<% } %>';
+        $markup = str_replace('{{post_name}}', get_the_title(), $markup);
+        $note_markup = '<script type="text/template" id="comments-header">';
+        $note_markup .= $markup;
+        $note_markup .= '</script>';
+
+        echo $note_markup;
+    }
 
 }
