@@ -1,3 +1,4 @@
+"use strict";
 var app = app || {};
 var $ = jQuery;
 app.CommentView = Backbone.View.extend({

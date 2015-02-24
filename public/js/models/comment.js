@@ -1,3 +1,4 @@
+"use strict";
 var app = app || {};
 // extending backbone model for comments model
 
