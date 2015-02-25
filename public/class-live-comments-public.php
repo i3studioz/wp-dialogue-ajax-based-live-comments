@@ -49,7 +49,7 @@ class Live_Comments_Public {
      */
     public function __construct($plugin_name, $version) {
 
-        $this->plugin_name = 'live-comments';
+        $this->plugin_name = 'wp-dialogue';
         $this->version = '1.0.0';
     }
 
@@ -164,7 +164,7 @@ class Live_Comments_Public {
 
             if (get_option('thread_comments')) {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
-                if ($comment->comment_author != $commenter['comment_author'] && $comment->comment_author_email != $current_user->user_email) {
+                if ((!is_user_logged_in() && $comment->comment_author != $commenter['comment_author']) || (is_user_logged_in() && $comment->comment_author_email != $current_user->user_email)) {
                     $comment_array['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth'), 'reply_text' => get_option('lc_reply_text')), $comment->comment_ID, $comment->comment_post_ID);
                 }
             }
@@ -368,14 +368,14 @@ class Live_Comments_Public {
 
             if (get_option('thread_comments')) {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
-                if ($comment->comment_author != $commenter['comment_author'] && $comment->comment_author_email != $current_user->user_email) {
-                    $comment_data['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth'), 'reply_text' => get_option('lc_reply_text')), $comment->comment_ID, $comment->comment_post_ID);
-                }
             }
 
             if ($comment->comment_parent) {
+
+                $reply_link = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth'), 'reply_text' => get_option('lc_reply_text')), $comment->comment_ID, $comment->comment_post_ID);
+
                 $comment_data['mention_link'] = $this->lc_prepare_mention_link($comment->comment_parent);
-                $this->lc_send_mention_mail($comment, $comment_data['reply_link']);
+                $this->lc_send_mention_mail($comment, $reply_link);
             }
         }
 
@@ -406,7 +406,7 @@ class Live_Comments_Public {
         $message = get_option('lc_mention_mail_markup');
         $message = str_replace('{{author}}', $comment->comment_author, $message);
         $message = str_replace('{{mentioned_author}}', $mentioned->comment_author, $message);
-        $message = str_replace('{{comment_post_link}}', $comment, $message);
+        $message = str_replace('{{comment_post_link}}', esc_url(get_comment_link($comment->comment_ID)), $message);
         $message = str_replace('{{comment_date}}', date('d F Y', strtotime($comment->comment_date)), $message);
         $message = str_replace('{{comment}}', $comment->comment_content, $message);
         $message = str_replace('{{reply_link}}', $reply_link, $message);
@@ -421,8 +421,8 @@ class Live_Comments_Public {
 
         // Additional headers
         $headers = 'From: ' . get_bloginfo('name') . ' <no-reply@' . $_SERVER['HTTP_HOST'] . '>' . $eol;
-        // Mail it
-        return mail($to, $subject, $message, $headers);
+        // @todo Mail it
+        //return mail($to, $subject, $message, $headers);
     }
 
     /**
@@ -542,6 +542,10 @@ class Live_Comments_Public {
         $comment_markup = '<script type="text/template" id="comments-template">';
         $comment_markup .= '<li id="comment-<%= comment_id %>" <%= comment_class %>>';
         $comment_markup .= $markup;
+//        $comment_markup .= '<div class="lc_review">'
+//                           .'<div class="lc_thumb"><a class="lc_thumb_btn lc_thumb_up_btn"></a><span class="lc_count">123</span></div>'
+//                           .'<div class="lc_thumb"><a class="lc_thumb_btn lc_thumb_down_btn"></a><span class="lc_count">333</span></div>'
+//                           .'</div>';
         $comment_markup .= '</li>';
         $comment_markup .= '</script>';
 
