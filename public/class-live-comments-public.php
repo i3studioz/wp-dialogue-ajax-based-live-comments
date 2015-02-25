@@ -361,16 +361,21 @@ class Live_Comments_Public {
                 'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
                 'comment' => $comment->comment_content,
                 'moderation_required' => !$comment->comment_approved,
-                'position' => 'new'
+                'position' => 'new',
+                'reply_link' => '',
+                'mention_link' => ''
             );
-            if ($comment->comment_parent) {
-                $comment_data['mention_link'] = $this->lc_prepare_mention_link($comment->comment_parent);
-            }
+
             if (get_option('thread_comments')) {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
                 if ($comment->comment_author != $commenter['comment_author'] && $comment->comment_author_email != $current_user->user_email) {
                     $comment_data['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth'), 'reply_text' => get_option('lc_reply_text')), $comment->comment_ID, $comment->comment_post_ID);
                 }
+            }
+
+            if ($comment->comment_parent) {
+                $comment_data['mention_link'] = $this->lc_prepare_mention_link($comment->comment_parent);
+                $this->lc_send_mention_mail($comment, $comment_data['reply_link']);
             }
         }
 
@@ -387,6 +392,37 @@ class Live_Comments_Public {
         echo json_encode($comment_data);
 
         die();
+    }
+
+    /**
+     * Send email on mentions
+     */
+    function lc_send_mention_mail($comment, $reply_link) {
+        $mentioned = get_comment($comment->comment_parent);
+
+        $to = $mentioned->comment_author_email;
+        $subject = get_option('lc_mention_mail_subject');
+
+        $message = get_option('lc_mention_mail_markup');
+        $message = str_replace('{{author}}', $comment->comment_author, $message);
+        $message = str_replace('{{mentioned_author}}', $mentioned->comment_author, $message);
+        $message = str_replace('{{comment_post_link}}', $comment, $message);
+        $message = str_replace('{{comment_date}}', date('d F Y', strtotime($comment->comment_date)), $message);
+        $message = str_replace('{{comment}}', $comment->comment_content, $message);
+        $message = str_replace('{{reply_link}}', $reply_link, $message);
+        $message = str_replace('{{mention_link}}', $this->lc_prepare_mention_link($comment->comment_parent), $message);
+
+        // carriage return type (we use a PHP end of line constant)
+        $eol = PHP_EOL;
+
+        // To send HTML mail, the Content-type header must be set
+        $headers = 'MIME-Version: 1.0' . $eol;
+        $headers .= 'Content-type: text/html; charset=iso-8859-1' . $eol;
+
+        // Additional headers
+        $headers = 'From: ' . get_bloginfo('name') . ' <no-reply@' . $_SERVER['HTTP_HOST'] . '>' . $eol;
+        // Mail it
+        return mail($to, $subject, $message, $headers);
     }
 
     /**

@@ -123,6 +123,27 @@ class Live_Comments_Admin {
         );
 
         add_settings_field(
+                'lc_enable_mentions_email', __('Enable Mentions', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_mentions_email', 'type' => 'checkbox', 'description' => '<i>Enable emails on mentions.</i>')
+        );
+        
+        add_settings_field(
+                'lc_mention_mail_subject', __('No More Comments Message', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_mention_mail_subject', 'type' => 'text', 'description' => __('Subject for mention email.', $this->plugin_name)
+                )
+        );
+
+        add_settings_field(
+                'lc_mention_mail_markup', __('Comment Markup', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_mention_mail_markup', 'type' => 'textarea', 'description' => __('Configure the markup for email to be sent on mentions. Click <a href="javascript:;" class="pop-up">here</a> to see available placeholders. <div class="toggle"><h3>Available Placeholders</h2>'
+                    . '<p><strong>{{author}} || </strong><span class="description">Author\'s name with link</span></p>'
+                    . '<p><strong>{{mentioned_author}} || </strong><span class="description">Mentioned Author\'s name</span></p>'
+                    . '<p><strong>{{comment_post_link}} || </strong><span class="description">Link for the post</span></p>'
+                    . '<p><strong>{{comment_date}} || </strong><span class="description">Date of comment</span></p>'
+                    . '<p><strong>{{comment}} || </strong><span class="description">Comment Text</span></p>'
+                    . '<p><strong>{{reply_link}} || </strong><span class="description">Reply link for the comment</span></p>'
+                    . '<p><strong>{{mention_link}} || </strong><span class="description">Mention text for the comment</span></p>'
+                    . '</div>', $this->plugin_name))
+        );
+
+        add_settings_field(
                 'lc_refresh_interval', __('Comments Refresh Interval', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_refresh_interval', 'type' => 'number', 'min' => 5000, 'steps' => 500, 'description' => __('Set refresh interval for fetching live comments.', $this->plugin_name)
                 )
         );
@@ -147,7 +168,6 @@ class Live_Comments_Admin {
                     . '<p><strong>{{comment}} || </strong><span class="description">Comment Text</span></p>'
                     . '<p><strong>{{reply_link}} || </strong><span class="description">Reply link for the comment</span></p>'
                     . '<p><strong>{{mention_link}} || </strong><span class="description">Mention text for the comment</span></p>'
-                    . '<p><strong>{{children}} || </strong><span class="description">Children comments, works only if threaded comments enabled.</span></p>'
                     . '</div>', $this->plugin_name))
         );
 
@@ -171,6 +191,12 @@ class Live_Comments_Admin {
         register_setting('discussion', 'lc_enable_mentions');
 
         register_setting('discussion', 'lc_reply_text');
+        
+        register_setting('discussion', 'lc_enable_mentions_email');
+        
+        register_setting('discussion', 'lc_mention_mail_subject');
+
+        register_setting('discussion', 'lc_mention_mail_markup');
 
         register_setting('discussion', 'lc_refresh_interval');
 
