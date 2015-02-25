@@ -158,9 +158,15 @@ class Live_Comments_Public {
                 'moderation_required' => !$comment->comment_approved,
             );
 
+            if ($comment->comment_parent) {
+                $comment_array['mention_link'] = $this->lc_prepare_mention_link($comment->comment_parent);
+            }
+
             if (get_option('thread_comments')) {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
-                $comment_array['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID);
+                if ($comment->comment_author != $commenter['comment_author'] && $comment->comment_author_email != $current_user->user_email) {
+                    $comment_array['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth'), 'reply_text' => get_option('lc_reply_text')), $comment->comment_ID, $comment->comment_post_ID);
+                }
             }
 
             if (isset($_GET['type']) && $_GET['type'] == 'newer') {
@@ -186,7 +192,8 @@ class Live_Comments_Public {
      * @global int $comment_depth
      */
     public function lc_add_comment_to_db() {
-        global $comment_depth;
+        global $comment_depth, $current_user; //, $post;
+        $commenter = wp_get_current_commenter();
         $time = current_time('mysql');
         $post_vars = json_decode(file_get_contents("php://input"), true);
 
@@ -270,7 +277,7 @@ class Live_Comments_Public {
         $comment_author_email = ( isset($post_vars['email']) ) ? trim($post_vars['email']) : null;
         $comment_author_url = ( isset($post_vars['website']) ) ? trim($post_vars['website']) : null;
         $comment_content = ( isset($post_vars['comment']) ) ? trim($post_vars['comment']) : null;
-        
+
 
 // If the user is logged in
         $user = wp_get_current_user();
@@ -318,15 +325,15 @@ class Live_Comments_Public {
         $comment_parent = isset($post_vars['comment_parent']) ? absint($post_vars['comment_parent']) : 0;
 
         $commentdata = compact('comment_post_ID', 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_type', 'comment_parent', 'user_ID');
-        
-        $commentdata['comment_date']     = current_time('mysql');
-	$commentdata['comment_date_gmt'] = current_time('mysql', 1);
-        $commentdata['comment_author_IP'] = preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] );
-        $commentdata['comment_agent']     = isset( $_SERVER['HTTP_USER_AGENT'] ) ? substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 ) : '';
-        
+
+        $commentdata['comment_date'] = current_time('mysql');
+        $commentdata['comment_date_gmt'] = current_time('mysql', 1);
+        $commentdata['comment_author_IP'] = preg_replace('/[^0-9a-fA-F:., ]/', '', $_SERVER['REMOTE_ADDR']);
+        $commentdata['comment_agent'] = isset($_SERVER['HTTP_USER_AGENT']) ? substr($_SERVER['HTTP_USER_AGENT'], 0, 254) : '';
+
         $commentdata = wp_filter_comment($commentdata);
 
-	$commentdata['comment_approved'] = wp_allow_comment($commentdata);
+        $commentdata['comment_approved'] = wp_allow_comment($commentdata);
         //echo wp_allow_comment($commentdata); die();
         $comment_id = wp_insert_comment($commentdata);
         if (!$comment_id) {
@@ -356,10 +363,14 @@ class Live_Comments_Public {
                 'moderation_required' => !$comment->comment_approved,
                 'position' => 'new'
             );
-
+            if ($comment->comment_parent) {
+                $comment_data['mention_link'] = $this->lc_prepare_mention_link($comment->comment_parent);
+            }
             if (get_option('thread_comments')) {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
-                $comment_data['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth')), $comment->comment_ID, $comment->comment_post_ID);
+                if ($comment->comment_author != $commenter['comment_author'] && $comment->comment_author_email != $current_user->user_email) {
+                    $comment_data['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth'), 'reply_text' => get_option('lc_reply_text')), $comment->comment_ID, $comment->comment_post_ID);
+                }
             }
         }
 
@@ -394,6 +405,12 @@ class Live_Comments_Public {
             $count += 1;
             return $this->lc_get_comment_depth($parent, $count);
         }
+    }
+
+    function lc_prepare_mention_link($comment_id) {
+        $comment = get_comment($comment_id);
+        $link = '@' . $comment->comment_author;
+        return $link;
     }
 
     /**
@@ -483,6 +500,7 @@ class Live_Comments_Public {
         $markup = str_replace('{{comment_date}}', '<time datetime="<%= comment_iso_time %>"><%= comment_date_readable %></time>', $markup);
         $markup = str_replace('{{moderation_message}}', '<% if(moderation_required){ %><p class="comment-awaiting-moderation">' . __('Your comment is awaiting moderation.', $this->plugin_name) . '</p><% } %>', $markup);
         $markup = str_replace('{{comment}}', '<%= comment %>', $markup);
+        $markup = str_replace('{{mention_link}}', '<% if(mention_link){ %><%= mention_link %>: <% } %>', $markup);
         $markup = str_replace('{{reply_link}}', '<%= reply_link %>', $markup);
         $markup = str_replace('{{children}}', '<ol class="children"></ol>', $markup);
         $comment_markup = '<script type="text/template" id="comments-template">';
@@ -509,7 +527,7 @@ class Live_Comments_Public {
      * Prepare new comments notification markup
      */
     function lc_comment_section_header() {
-        
+
         $markup = get_option('lc_comment_section_header');
         $markup = '<% if(count > 0){ %>' . str_replace('{{count}}', '<%= count %>', $markup) . '<% } %>';
         $markup = str_replace('{{post_name}}', get_the_title(), $markup);

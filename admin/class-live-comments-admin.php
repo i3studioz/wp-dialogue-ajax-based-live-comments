@@ -115,6 +115,14 @@ class Live_Comments_Admin {
         );
 
         add_settings_field(
+                'lc_enable_mentions', __('Enable Mentions', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_mentions', 'type' => 'checkbox', 'description' => '<i>Overrides the comments nesting feature of WordPress with mentions. Uses the same settings though. The nesting depth will be used to check level of mentions allowed.</i>')
+        );
+
+        add_settings_field(
+                'lc_reply_text', __('Mention Link Text', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_reply_text', 'description' => '<i>Mention Link Text</i>')
+        );
+
+        add_settings_field(
                 'lc_refresh_interval', __('Comments Refresh Interval', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_refresh_interval', 'type' => 'number', 'min' => 5000, 'steps' => 500, 'description' => __('Set refresh interval for fetching live comments.', $this->plugin_name)
                 )
         );
@@ -138,6 +146,7 @@ class Live_Comments_Admin {
                     . '<p><strong>{{moderation_message}} || </strong><span class="description">Message for unapproved comments</span></p>'
                     . '<p><strong>{{comment}} || </strong><span class="description">Comment Text</span></p>'
                     . '<p><strong>{{reply_link}} || </strong><span class="description">Reply link for the comment</span></p>'
+                    . '<p><strong>{{mention_link}} || </strong><span class="description">Mention text for the comment</span></p>'
                     . '<p><strong>{{children}} || </strong><span class="description">Children comments, works only if threaded comments enabled.</span></p>'
                     . '</div>', $this->plugin_name))
         );
@@ -158,6 +167,10 @@ class Live_Comments_Admin {
         register_setting('discussion', 'lc_avatar_size');
 
         register_setting('discussion', 'lc_form_position');
+
+        register_setting('discussion', 'lc_enable_mentions');
+
+        register_setting('discussion', 'lc_reply_text');
 
         register_setting('discussion', 'lc_refresh_interval');
 
@@ -180,10 +193,12 @@ class Live_Comments_Admin {
         //print_r($args);
         //echo get_option($args['name']);
         $html = '<fieldset>';
-        switch ($args['type']) {
+        $type = isset($args['type']) ? $args['type'] : '';
+        switch ($type) {
             case 'checkbox':
+                $html .= '<label for="' . $args['name'] . '">';
                 $html .= '<input type="checkbox" id="' . $args['name'] . '" name="' . $args['name'] . '" value="1" ' . checked(1, get_option($args['name']), false) . '/>';
-                $html .= '<label for="' . $args['name'] . '"> ' . $args['description'] . '</label>';
+                $html .= $args['description'] . '</label>';
                 break;
 
             case 'radio':
@@ -221,6 +236,17 @@ class Live_Comments_Admin {
         $html .= '</fieldset>';
 
         echo $html;
+    }
+
+    function lc_toggle_nesting() {
+        if (get_option('lc_enable_mentions')) {
+            update_option('thread_comments', 1);
+        } else if (get_option('thread_comments')) {
+            update_option('lc_enable_mentions', 1);
+        } else {
+            update_option('lc_enable_mentions', null);
+            update_option('thread_comments', null);
+        }
     }
 
 }

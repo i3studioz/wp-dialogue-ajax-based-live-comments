@@ -105,7 +105,8 @@ app.CommentView = Backbone.View.extend({
             comment: this.$comment.val().trim(),
             moderation_required: true,
             reply_link: '',
-            position: ''
+            position: '',
+            mention_link: ''
         };
 
     },
@@ -172,11 +173,12 @@ app.CommentView = Backbone.View.extend({
         var item_json = item.toJSON();
         //console.log(item_json);
         var type = item_json.position;
-        if (item_json.comment_parent != 0 && $('#comment-' + item_json.comment_parent).length > 0 && lc_vars.thread_comments == 1) {
-            $('#comment-' + item_json.comment_parent + ' > ol.children', this.el).append(this.template(item_json));
-            //} else if (type == 'old') {
-
-        } else if (type == 'new') {
+//        if (item_json.comment_parent != 0 && $('#comment-' + item_json.comment_parent).length > 0 && lc_vars.thread_comments == 1) {
+//            $('#comment-' + item_json.comment_parent + ' > ol.children', this.el).append(this.template(item_json));
+//            //} else if (type == 'old') {
+//
+//        } else 
+        if (type == 'new') {
             if (lc_vars.comment_order == 'desc')
                 $('ol.comment-list', this.el).prepend(this.template(item_json));
             else

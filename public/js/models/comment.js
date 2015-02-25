@@ -22,7 +22,8 @@ app.Comment = Backbone.Model.extend({
         comment: '',
         moderation_required: true,
         reply_link : '',
-        position: ''
+        position: '',
+        mention_link:''
     },
     idAttribute: 'comment_id',
     actionURL: {
