@@ -184,11 +184,11 @@ app.CommentView = Backbone.View.extend({
             else
                 $('ol.comment-list', this.el).append(this.template(item_json));
 
-            var $old_color = $('#comment-' + item_json.comment_id).css('background-color');
-            $('#comment-' + item_json.comment_id).css('background-color', lc_vars.new_item_color);
+            var $old_color = $('#div-comment-' + item_json.comment_id).css('background-color');
+            $('#div-comment-' + item_json.comment_id).css('background-color', lc_vars.new_item_color);
 
             setTimeout(function () {
-                $('#comment-' + item_json.comment_id).css('background-color', $old_color);
+                $('#div-comment-' + item_json.comment_id).css('background-color', $old_color);
             }, 2000);
 
         } else {

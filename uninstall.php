@@ -28,4 +28,9 @@
 // If uninstall not called from WordPress, then exit.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
+}else{
+    global $wpdb;
+    
+    $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE 'lc_%';");
+    
 }

@@ -127,7 +127,7 @@ class Live_Comments_Admin {
         );
         
         add_settings_field(
-                'lc_mention_mail_subject', __('No More Comments Message', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_mention_mail_subject', 'type' => 'text', 'description' => __('Subject for mention email.', $this->plugin_name)
+                'lc_mention_mail_subject', __('Mention Mail Subject', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_mention_mail_subject', 'type' => 'text', 'description' => __('Subject for mention email.', $this->plugin_name)
                 )
         );
 

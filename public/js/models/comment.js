@@ -27,10 +27,10 @@ app.Comment = Backbone.Model.extend({
     },
     idAttribute: 'comment_id',
     actionURL: {
-        'read': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=fetch_comment',
-        'create': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment',
-        'update': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=add_comment',
-        'delete': 'http://localhost/live-comments/wp-admin/admin-ajax.php?action=remove_comment'
+        'read': lc_vars.ajax_url+'?action=fetch_comment',
+        'create': lc_vars.ajax_url+'?action=add_comment',
+        'update': lc_vars.ajax_url+'?action=add_comment',
+        'delete': lc_vars.ajax_url+'?action=remove_comment'
     },
     sync: function(method, model, options) {
         options = options || {};

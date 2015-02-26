@@ -444,8 +444,10 @@ class Live_Comments_Public {
     }
 
     function lc_prepare_mention_link($comment_id) {
-        $comment = get_comment($comment_id);
-        $link = '@' . $comment->comment_author;
+        //echo $comment = $comment_id;
+        $mentioned = get_comment($comment_id);
+        //print_r($mentioned);
+        $link = '@' . $mentioned->comment_author;
         return $link;
     }
 
