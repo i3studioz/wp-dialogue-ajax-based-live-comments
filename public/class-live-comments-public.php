@@ -153,7 +153,7 @@ class Live_Comments_Public {
                 'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
                 'comment_iso_time' => date('c', strtotime($comment->comment_date)),
                 'comment_date' => $comment->comment_date,
-                'comment_date_readable' => date(get_option('date_format'). ' '.  get_option('time_format'), strtotime($comment->comment_date)),
+                'comment_date_readable' => date(get_option('date_format') . ' ' . get_option('time_format'), strtotime($comment->comment_date)),
                 'comment' => $comment->comment_content,
                 'moderation_required' => !$comment->comment_approved,
             );
@@ -358,7 +358,7 @@ class Live_Comments_Public {
                 'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
                 'comment_iso_time' => date('c', strtotime($comment->comment_date)),
                 'comment_date' => $comment->comment_date,
-                'comment_date_readable' => date(get_option('date_format'). ' '.  get_option('time_format'), strtotime($comment->comment_date)),
+                'comment_date_readable' => date(get_option('date_format') . ' ' . get_option('time_format'), strtotime($comment->comment_date)),
                 'comment' => $comment->comment_content,
                 'moderation_required' => !$comment->comment_approved,
                 'position' => 'new',
@@ -530,54 +530,59 @@ class Live_Comments_Public {
       ############################################################### */
 
     function lc_comments_markup() {
-        $markup = get_option('lc_comment_markup');
-        $markup = str_replace('{{comment_id}}', '<%= comment_id %>', $markup);
-        $markup = str_replace('{{avatar}}', '<% if(avatar){ %><%= avatar %><% } %>', $markup);
-        $markup = str_replace('{{author}}', '<% if(website){ %><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a><% } else { %><%= author %><% } %>', $markup);
-        $markup = str_replace('{{comment_post_link}}', '<%= comment_post_link %>', $markup);
-        $markup = str_replace('{{comment_date}}', '<time datetime="<%= comment_iso_time %>"><%= comment_date_readable %></time>', $markup);
-        $markup = str_replace('{{moderation_message}}', '<% if(moderation_required){ %><p class="comment-awaiting-moderation">' . __('Your comment is awaiting moderation.', $this->plugin_name) . '</p><% } %>', $markup);
-        $markup = str_replace('{{comment}}', '<%= comment %>', $markup);
-        $markup = str_replace('{{mention_link}}', '<% if(mention_link){ %><%= mention_link %>: <% } %>', $markup);
-        $markup = str_replace('{{reply_link}}', '<%= reply_link %>', $markup);
-        $markup = str_replace('{{children}}', '<ol class="children"></ol>', $markup);
-        $comment_markup = '<script type="text/template" id="comments-template">';
-        $comment_markup .= '<li id="comment-<%= comment_id %>" <%= comment_class %>>';
-        $comment_markup .= $markup;
+        if (is_singular() && comments_open()) {
+            $markup = get_option('lc_comment_markup');
+            $markup = str_replace('{{comment_id}}', '<%= comment_id %>', $markup);
+            $markup = str_replace('{{avatar}}', '<% if(avatar){ %><%= avatar %><% } %>', $markup);
+            $markup = str_replace('{{author}}', '<% if(website){ %><a href="<%= website %>" rel="external nofollow" class="url"><%= author %></a><% } else { %><%= author %><% } %>', $markup);
+            $markup = str_replace('{{comment_post_link}}', '<%= comment_post_link %>', $markup);
+            $markup = str_replace('{{comment_date}}', '<time datetime="<%= comment_iso_time %>"><%= comment_date_readable %></time>', $markup);
+            $markup = str_replace('{{moderation_message}}', '<% if(moderation_required){ %><p class="comment-awaiting-moderation">' . __('Your comment is awaiting moderation.', $this->plugin_name) . '</p><% } %>', $markup);
+            $markup = str_replace('{{comment}}', '<%= comment %>', $markup);
+            $markup = str_replace('{{mention_link}}', '<% if(mention_link){ %><%= mention_link %>: <% } %>', $markup);
+            $markup = str_replace('{{reply_link}}', '<%= reply_link %>', $markup);
+            $markup = str_replace('{{children}}', '<ol class="children"></ol>', $markup);
+            $comment_markup = '<script type="text/template" id="comments-template">';
+            $comment_markup .= '<li id="comment-<%= comment_id %>" <%= comment_class %>>';
+            $comment_markup .= $markup;
 //        $comment_markup .= '<div class="lc_review">'
 //                           .'<div class="lc_thumb"><a class="lc_thumb_btn lc_thumb_up_btn"></a><span class="lc_count">123</span></div>'
 //                           .'<div class="lc_thumb"><a class="lc_thumb_btn lc_thumb_down_btn"></a><span class="lc_count">333</span></div>'
 //                           .'</div>';
-        $comment_markup .= '</li>';
-        $comment_markup .= '</script>';
+            $comment_markup .= '</li>';
+            $comment_markup .= '</script>';
 
-        echo $comment_markup;
+            echo $comment_markup;
+        }
     }
 
     /**
      * Prepare new comments notification markup
      */
     function lc_new_comments_notification_markup() {
-        $note_markup = '<script type="text/template" id="new-comments">';
-        $note_markup .= '<% if(count > 0){ %>' . str_replace('{{count}}', '<%= count %>', get_option('lc_new_comments_note')) . '<% } %>';
-        $note_markup .= '</script>';
+        if (is_singular() && comments_open()) {
+            $note_markup = '<script type="text/template" id="new-comments">';
+            $note_markup .= '<% if(count > 0){ %>' . str_replace('{{count}}', '<%= count %>', get_option('lc_new_comments_note')) . '<% } %>';
+            $note_markup .= '</script>';
 
-        echo $note_markup;
+            echo $note_markup;
+        }
     }
 
     /**
      * Prepare new comments notification markup
      */
     function lc_comment_section_header() {
+        if (is_singular() && comments_open()) {
+            $markup = get_option('lc_comment_section_header');
+            $markup = '<% if(count > 0){ %>' . str_replace('{{count}}', '<%= count %>', $markup) . '<% } %>';
+            $markup = str_replace('{{post_name}}', get_the_title(), $markup);
+            $note_markup = '<script type="text/template" id="comments-header">';
+            $note_markup .= $markup;
+            $note_markup .= '</script>';
 
-        $markup = get_option('lc_comment_section_header');
-        $markup = '<% if(count > 0){ %>' . str_replace('{{count}}', '<%= count %>', $markup) . '<% } %>';
-        $markup = str_replace('{{post_name}}', get_the_title(), $markup);
-        $note_markup = '<script type="text/template" id="comments-header">';
-        $note_markup .= $markup;
-        $note_markup .= '</script>';
-
-        echo $note_markup;
+            echo $note_markup;
+        }
     }
 
 }

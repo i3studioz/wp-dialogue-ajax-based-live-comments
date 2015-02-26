@@ -71,9 +71,13 @@ class Live_Comments_Admin {
          * between the defined hooks and the functions defined in this
          * class.
          */
-        wp_enqueue_style('wp-color-picker');
+        $screen = get_current_screen();
 
-        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/live-comments-admin.css', array(), $this->version, 'all');
+        if ($screen->id == 'options-discussion') {
+            wp_enqueue_style('wp-color-picker');
+
+            wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/live-comments-admin.css', array(), $this->version, 'all');
+        }
     }
 
     /**
@@ -94,7 +98,11 @@ class Live_Comments_Admin {
          * between the defined hooks and the functions defined in this
          * class.
          */
-        wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/live-comments-admin.js', array('jquery', 'wp-color-picker'), $this->version, false);
+        $screen = get_current_screen();
+        
+        if ($screen->id == 'options-discussion') {
+            wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/live-comments-admin.js', array('jquery', 'wp-color-picker'), $this->version, false);
+        }
     }
 
     /**
@@ -125,7 +133,7 @@ class Live_Comments_Admin {
         add_settings_field(
                 'lc_enable_mentions_email', __('Enable Mentions', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_mentions_email', 'type' => 'checkbox', 'description' => '<i>Enable emails on mentions.</i>')
         );
-        
+
         add_settings_field(
                 'lc_mention_mail_subject', __('Mention Mail Subject', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_mention_mail_subject', 'type' => 'text', 'description' => __('Subject for mention email.', $this->plugin_name)
                 )
@@ -191,9 +199,9 @@ class Live_Comments_Admin {
         register_setting('discussion', 'lc_enable_mentions');
 
         register_setting('discussion', 'lc_reply_text');
-        
+
         register_setting('discussion', 'lc_enable_mentions_email');
-        
+
         register_setting('discussion', 'lc_mention_mail_subject');
 
         register_setting('discussion', 'lc_mention_mail_markup');
