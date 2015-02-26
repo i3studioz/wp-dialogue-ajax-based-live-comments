@@ -21,7 +21,7 @@ if (post_password_required())
                 ?>
             </h2>
             <a href="javascript:;" id="load-new-comments"></a>
-        <?php } elseif (get_comment_pages_count() > 1 && get_option('page_comments')) { // are there comments to navigate through
+        <?php } elseif (get_comment_pages_count() > 0 && get_option('page_comments')) { // are there comments to navigate through
             ?>
             <h2 class="comments-title">
                 <?php

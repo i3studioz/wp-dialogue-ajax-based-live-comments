@@ -153,7 +153,7 @@ class Live_Comments_Public {
                 'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
                 'comment_iso_time' => date('c', strtotime($comment->comment_date)),
                 'comment_date' => $comment->comment_date,
-                'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
+                'comment_date_readable' => date(get_option('date_format'). ' '.  get_option('time_format'), strtotime($comment->comment_date)),
                 'comment' => $comment->comment_content,
                 'moderation_required' => !$comment->comment_approved,
             );
@@ -358,7 +358,7 @@ class Live_Comments_Public {
                 'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
                 'comment_iso_time' => date('c', strtotime($comment->comment_date)),
                 'comment_date' => $comment->comment_date,
-                'comment_date_readable' => date('d F Y', strtotime($comment->comment_date)),
+                'comment_date_readable' => date(get_option('date_format'). ' '.  get_option('time_format'), strtotime($comment->comment_date)),
                 'comment' => $comment->comment_content,
                 'moderation_required' => !$comment->comment_approved,
                 'position' => 'new',

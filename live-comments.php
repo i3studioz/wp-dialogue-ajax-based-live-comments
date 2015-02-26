@@ -13,11 +13,11 @@
  * @package           Live_Comments
  *
  * @wordpress-plugin
- * Plugin Name:       Live Comments
+ * Plugin Name:       WP Dialogue
  * Plugin URI:        http://example.com/live-comments-uri/
  * Description:       Turn WordPress native comments into a live discussion system.
  * Version:           1.0.0
- * Author:            Arun Singh
+ * Author:            WP Team @ i3studioz
  * Author URI:        http://example.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
