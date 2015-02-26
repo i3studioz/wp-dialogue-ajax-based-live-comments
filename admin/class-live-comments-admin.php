@@ -111,7 +111,7 @@ class Live_Comments_Admin {
      */
     //add_action('admin_init', 'lc_settings');
     function lc_settings() {
-        add_settings_section('lc_settings', __('Live Comment Settings', $this->plugin_name), array(&$this, 'lc_discussion_options'), 'discussion');
+        add_settings_section('lc_settings', __('WP Dialogue Settings', $this->plugin_name), array(&$this, 'lc_discussion_options'), 'discussion');
 
         add_settings_field(
                 'lc_avatar_size', __('Avatar Size', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_avatar_size', 'type' => 'number', 'description' => __('Set sefault avatar size to be displayed in comments area.', $this->plugin_name)
