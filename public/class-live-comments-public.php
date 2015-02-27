@@ -479,10 +479,11 @@ class Live_Comments_Public {
             $highlight_color = get_option('lc_highlight_color');
             $no_more = get_option('lc_no_more');
             $total_comment = get_comments_number();
+            $current_time = date('Y-m-d H:i:s'); //2015-02-27 13:11:57
 //print_r($new_start);
             echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval, 'no_more_text' => __($no_more, $this->plugin_name), 'initial_count' => $total_comment)) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval, 'no_more_text' => __($no_more, $this->plugin_name), 'initial_count' => $total_comment, 'current_time' => $current_time)) .
             '/* ]]> */
             </script>';
         }

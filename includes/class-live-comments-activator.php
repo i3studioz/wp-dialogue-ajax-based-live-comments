@@ -45,6 +45,7 @@ class Live_Comments_Activator {
         // Form Position
         if (!get_option('lc_form_position')) {
             add_option('lc_form_position', 'top');
+            update_option('comment_order', 'desc');
         }
 
         // Enable Mentions
@@ -115,7 +116,7 @@ class Live_Comments_Activator {
                                 </footer><!-- .comment-meta -->
 
                                 <div class="comment-content">
-                                    {{mention_link}} {{comment}}
+                                    <strong>{{mention_link}}</strong> {{comment}}
                                 </div><!-- .comment-content -->
 
                                 <div class="reply">{{reply_link}}</div>

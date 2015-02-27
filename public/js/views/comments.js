@@ -49,16 +49,20 @@ app.CommentView = Backbone.View.extend({
     },
     getLiveComments: function () {
         //console.log('here');
+        //clearInterval(this.liveLoader);
+
         var self = this;
         this.collection.fetch({
             remove: false,
             silent: true,
             success: function (collection, response) {
                 $('#load-new-comments').html(self.new_template({count: response.length}));
-                //console.log(response.length);
+                //console.log(response);
+                //self.restartLiveFetch();
             },
             error: function (collection, response) {
-                console.log(response);
+                //console.log(response);
+                //self.restartLiveFetch();
             }
         });
     },
@@ -139,7 +143,7 @@ app.CommentView = Backbone.View.extend({
                             self.collection.meta('total_comments', parseInt(self.collection.meta('total_comments')) + 1);
                             self.collection.add(comment_json);
                             window.location.hash = 'comment-' + comment_json.comment_id;
-                            $('#commentform').get(0).reset();
+                            $('#comment').val('');
                         }
                         self.restartLiveFetch();
                     },
@@ -213,24 +217,36 @@ app.CommentView = Backbone.View.extend({
         }, this);
         this.updateCommentHeader();
         this.initializeLiveVars();
-    },
-    initializeLiveVars: function () {
-        var first = this.collection.max(function (model) {
-            return model.get('comment_id');
-        });
-        //console.log(first);
-        this.collection.meta('read_type', 'newer');
-        this.collection.meta('new_start', first.get('comment_date'));
-        this.collection.meta('max_id', first.get('comment_id'));
-
         $('#load-new-comments').html('');
     },
+    initializeLiveVars: function () {
+        var first = false;
+        if (this.collection.length > 0) {
+            var first = this.collection.max(function (model) {
+                return model.get('comment_id');
+            });
+        }
+        //console.log(first);
+        this.collection.meta('read_type', 'newer');
+        if (first) {
+            this.collection.meta('new_start', first.get('comment_date'));
+            this.collection.meta('max_id', first.get('comment_id'));
+        } else {
+            this.collection.meta('new_start', lc_vars.current_time);
+            this.collection.meta('max_id', 0);
+        }
+    },
     initializePageVars: function () {
-        var last = this.collection.min(function (model) {
-            return model.get('comment_id');
-        });
+        var last = false;
+        if (this.collection.length > 0) {
+            var last = this.collection.min(function (model) {
+                return model.get('comment_id');
+            });
+        }
         //console.log(last);
         this.collection.meta('read_type', 'older');
-        this.collection.meta('old_start', last.get('comment_date'));
+        if (last) {
+            this.collection.meta('old_start', last.get('comment_date'));
+        }
     }
 });
