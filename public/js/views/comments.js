@@ -36,7 +36,7 @@ app.CommentView = Backbone.View.extend({
         this.liveLoader = setInterval(function () {
             self.getLiveComments();
         }, lc_vars.refresh_interval);
-
+               
         this.render();
     },
     render: function () {
@@ -247,6 +247,8 @@ app.CommentView = Backbone.View.extend({
         this.collection.meta('read_type', 'older');
         if (last) {
             this.collection.meta('old_start', last.get('comment_date'));
+        }else {
+            this.collection.meta('old_start', lc_vars.current_time);
         }
     }
 });
