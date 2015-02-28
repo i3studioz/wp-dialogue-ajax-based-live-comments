@@ -3,11 +3,11 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link       http://example.com
+ * @link       http://www.i3studioz.com/wp-dialogue
  * @since      1.0.0
  *
- * @package    Live_Comments
- * @subpackage Live_Comments/includes
+ * @package    WP_Dialogue
+ * @subpackage WP_Dialogue/includes
  */
 
 /**
@@ -17,9 +17,9 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Live_Comments
- * @subpackage Live_Comments/includes
- * @author     Arun Singh <devarun444@gmail.com>
+ * @package    WP_Dialogue
+ * @subpackage WP_Dialogue/includes
+ * @author     WP Team @ i3studioz <developer@i3studioz.com>
  */
 class Live_Comments_Loader {
 

@@ -3,11 +3,11 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       http://example.com
+ * @link       http://www.i3studioz.com/wp-dialogue
  * @since      1.0.0
  *
- * @package    Live_Comments
- * @subpackage Live_Comments/public
+ * @package    WP_Dialogue
+ * @subpackage WP_Dialogue/public
  */
 
 /**
@@ -17,8 +17,8 @@
  * enqueue the dashboard-specific stylesheet and JavaScript.
  *
  * @package    Live Comments
- * @subpackage Live_Comments/public
- * @author     Arun Singh <devarun444@gmail.com>
+ * @subpackage WP_Dialogue/public
+ * @author     WP Team @ i3studioz <developer@i3studioz.com>
  */
 class Live_Comments_Public {
 

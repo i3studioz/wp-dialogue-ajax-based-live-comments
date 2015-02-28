@@ -19,10 +19,10 @@
  * For more information, see the following discussion:
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
- * @link       http://example.com
+ * @link       http://www.i3studioz.com/wp-dialogue
  * @since      1.0.0
  *
- * @package    Live_Comments
+ * @package    WP_Dialogue
  */
 
 // If uninstall not called from WordPress, then exit.

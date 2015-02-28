@@ -5,11 +5,11 @@
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       http://example.com
+ * @link       http://www.i3studioz.com/wp-dialogue
  * @since      1.0.0
  *
- * @package    Live_Comments
- * @subpackage Live_Comments/admin/partials
+ * @package    WP_Dialogue
+ * @subpackage WP_Dialogue/admin/partials
  */
 ?>
 

@@ -3,11 +3,11 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       http://example.com
+ * @link       http://www.i3studioz.com/wp-dialogue
  * @since      1.0.0
  *
- * @package    Live_Comments
- * @subpackage Live_Comments/includes
+ * @package    WP_Dialogue
+ * @subpackage WP_Dialogue/includes
  */
 
 /**
@@ -16,9 +16,9 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Live_Comments
- * @subpackage Live_Comments/includes
- * @author     Arun Singh <devarun444@gmail.com>
+ * @package    WP_Dialogue
+ * @subpackage WP_Dialogue/includes
+ * @author     WP Team @ i3studioz <developer@i3studioz.com>
  */
 class Live_Comments_Deactivator {
 

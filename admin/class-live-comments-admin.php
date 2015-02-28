@@ -3,11 +3,11 @@
 /**
  * The dashboard-specific functionality of the plugin.
  *
- * @link       http://example.com
+ * @link       http://www.i3studioz.com/wp-dialogue
  * @since      1.0.0
  *
- * @package    Live_Comments
- * @subpackage Live_Comments/admin
+ * @package    WP_Dialogue
+ * @subpackage WP_Dialogue/admin
  */
 
 /**
@@ -16,9 +16,9 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the dashboard-specific stylesheet and JavaScript.
  *
- * @package    Live_Comments
- * @subpackage Live_Comments/admin
- * @author     Arun Singh <devarun444@gmail.com>
+ * @package    WP_Dialogue
+ * @subpackage WP_Dialogue/admin
+ * @author     WP Team @ i3studioz <developer@i3studioz.com>
  */
 class Live_Comments_Admin {
 
@@ -142,7 +142,7 @@ class Live_Comments_Admin {
         );
 
         add_settings_field(
-                'lc_mention_mail_markup', __('Comment Markup', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_mention_mail_markup', 'type' => 'textarea', 'description' => __('Configure the markup for email to be sent on mentions. Click <a href="javascript:;" class="pop-up">here</a> to see available placeholders. <div class="toggle"><h3>Available Placeholders</h2>'
+                'lc_mention_mail_markup', __('Email Markup', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_mention_mail_markup', 'type' => 'textarea', 'description' => __('Configure the markup for email to be sent on mentions. Click <a href="javascript:;" class="pop-up">here</a> to see available placeholders. <div class="toggle"><h3>Available Placeholders</h2>'
                     . '<p><strong>{{author}} || </strong><span class="description">Author\'s name with link</span></p>'
                     . '<p><strong>{{mentioned_author}} || </strong><span class="description">Mentioned Author\'s name</span></p>'
                     . '<p><strong>{{comment_post_link}} || </strong><span class="description">Link for the post</span></p>'
