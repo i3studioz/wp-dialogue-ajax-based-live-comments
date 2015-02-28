@@ -99,7 +99,7 @@ class Live_Comments_Admin {
          * class.
          */
         $screen = get_current_screen();
-        
+
         if ($screen->id == 'options-discussion') {
             wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/live-comments-admin.js', array('jquery', 'wp-color-picker'), $this->version, false);
         }
@@ -121,7 +121,9 @@ class Live_Comments_Admin {
         add_settings_field(
                 'lc_form_position', __('Comment Form Position', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_form_position', 'type' => 'radio', 'options' => array('top' => __('Above Comments', $this->plugin_name), 'bottom' => __('Below Comments', $this->plugin_name)))
         );
-
+        add_settings_field(
+                'lc_enable_bootstrap', __('Enable Bootstrap For Form Fields', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_bootstrap', 'type' => 'checkbox', 'description' => '<i>Enable bootstrap for form fields</i>')
+        );
         add_settings_field(
                 'lc_enable_mentions', __('Enable Mentions', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_mentions', 'type' => 'checkbox', 'description' => '<i>Overrides the comments nesting feature of WordPress with mentions. Uses the same settings though. The nesting depth will be used to check level of mentions allowed.</i>')
         );
@@ -164,7 +166,9 @@ class Live_Comments_Admin {
                 'lc_no_more', __('No More Comments Message', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_no_more', 'type' => 'text', 'description' => __('Message text for no more coments.', $this->plugin_name)
                 )
         );
-
+        add_settings_field(
+                'lc_comment_format', __('Choose Comment Format', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_comment_format', 'type' => 'radio', 'options' => array('div' => __('Div', $this->plugin_name), 'ul' => __('Unordered List', $this->plugin_name), 'ol' => __('Ordered List', $this->plugin_name)))
+        );
         add_settings_field(
                 'lc_comment_markup', __('Comment Markup', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_comment_markup', 'type' => 'textarea', 'description' => __('Configure the markup for individual comments to be displayed on front end. Click <a href="javascript:;" class="pop-up">here</a> to see available placeholders. <div class="toggle"><h3>Available Placeholders</h2>'
                     . '<p><strong>{{comment_id}} || </strong><span class="description">ID for the comment</span></p>'
@@ -195,6 +199,8 @@ class Live_Comments_Admin {
         register_setting('discussion', 'lc_avatar_size');
 
         register_setting('discussion', 'lc_form_position');
+        
+        register_setting('discussion', 'lc_enable_bootstrap');
 
         register_setting('discussion', 'lc_enable_mentions');
 
@@ -211,6 +217,8 @@ class Live_Comments_Admin {
         register_setting('discussion', 'lc_highlight_color');
 
         register_setting('discussion', 'lc_no_more');
+        
+        register_setting('discussion', 'lc_comment_format');
 
         register_setting('discussion', 'lc_comment_markup');
 

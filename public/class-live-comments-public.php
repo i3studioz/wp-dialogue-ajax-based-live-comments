@@ -139,24 +139,7 @@ class Live_Comments_Public {
                 continue;
             }
 
-            $comment_array = array
-                (
-                'comment_id' => $comment->comment_ID,
-                'comment_post_id' => $comment->comment_post_ID,
-                'comment_parent' => $comment->comment_parent,
-                'comment_class' => comment_class('', $comment->comment_ID, $post_id, false),
-                'author' => $comment->comment_author,
-                'email' => $comment->comment_author_email,
-                'website' => $comment->comment_author_url,
-                'avatar' => get_avatar($comment->comment_author_email, get_option('lc_avatar_size')),
-                'avatar_size' => get_option('lc_avatar_size'),
-                'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
-                'comment_iso_time' => date('c', strtotime($comment->comment_date)),
-                'comment_date' => $comment->comment_date,
-                'comment_date_readable' => date(get_option('date_format') . ' ' . get_option('time_format'), strtotime($comment->comment_date)),
-                'comment' => $comment->comment_content,
-                'moderation_required' => !$comment->comment_approved,
-            );
+            $comment_array = $this->lc_get_comment_data($comment);
 
             if ($comment->comment_parent) {
                 $comment_array['mention_link'] = $this->lc_prepare_mention_link($comment->comment_parent);
@@ -164,7 +147,9 @@ class Live_Comments_Public {
 
             if (get_option('thread_comments')) {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
+
                 if ((!is_user_logged_in() && $comment->comment_author != $commenter['comment_author']) || (is_user_logged_in() && $comment->comment_author_email != $current_user->user_email)) {
+
                     $comment_array['reply_link'] = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth'), 'reply_text' => get_option('lc_reply_text')), $comment->comment_ID, $comment->comment_post_ID);
                 }
             }
@@ -345,26 +330,7 @@ class Live_Comments_Public {
         $comment = get_comment($comment_id);
         if ($comment->comment_approved != 'spam') {
 //$comment_depth = $this->lc_get_comment_depth($comment_id);
-            $comment_data = array(
-                'comment_id' => $comment->comment_ID,
-                'comment_post_id' => $comment->comment_post_ID,
-                'comment_parent' => $comment->comment_parent,
-                'comment_class' => comment_class('', $comment->comment_ID, $comment->comment_post_ID, false),
-                'author' => $comment->comment_author,
-                'email' => $comment->comment_author_email,
-                'website' => $comment->comment_author_url,
-                'avatar' => get_avatar($comment->comment_author_email, get_option('lc_avatar_size')),
-                'avatar_size' => get_option('lc_avatar_size'),
-                'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
-                'comment_iso_time' => date('c', strtotime($comment->comment_date)),
-                'comment_date' => $comment->comment_date,
-                'comment_date_readable' => date(get_option('date_format') . ' ' . get_option('time_format'), strtotime($comment->comment_date)),
-                'comment' => $comment->comment_content,
-                'moderation_required' => !$comment->comment_approved,
-                'position' => 'new',
-                'reply_link' => '',
-                'mention_link' => ''
-            );
+            $comment_data = $this->lc_get_comment_data($comment);
 
             if (get_option('thread_comments')) {
                 $comment_depth = $this->lc_get_comment_depth($comment->comment_ID);
@@ -392,6 +358,28 @@ class Live_Comments_Public {
         echo json_encode($comment_data);
 
         die();
+    }
+
+    function lc_get_comment_data($comment) {
+        return array(
+            'comment_id' => $comment->comment_ID,
+            'comment_post_id' => $comment->comment_post_ID,
+            'comment_parent' => $comment->comment_parent,
+            'comment_class' => comment_class('', $comment->comment_ID, $comment->comment_post_ID, false),
+            'author' => $comment->comment_author,
+            'email' => $comment->comment_author_email,
+            'website' => $comment->comment_author_url,
+            'avatar' => get_avatar($comment->comment_author_email, get_option('lc_avatar_size')),
+            'comment_post_link' => esc_url(get_comment_link($comment->comment_ID)),
+            'comment_iso_time' => date('c', strtotime($comment->comment_date)),
+            'comment_date' => $comment->comment_date,
+            'comment_date_readable' => date(get_option('date_format') . ' ' . get_option('time_format'), strtotime($comment->comment_date)),
+            'comment' => $comment->comment_content,
+            'moderation_required' => !$comment->comment_approved,
+            'position' => 'new',
+            'reply_link' => '',
+            'mention_link' => ''
+        );
     }
 
     /**
@@ -544,13 +532,22 @@ class Live_Comments_Public {
             $markup = str_replace('{{reply_link}}', '<%= reply_link %>', $markup);
             $markup = str_replace('{{children}}', '<ol class="children"></ol>', $markup);
             $comment_markup = '<script type="text/template" id="comments-template">';
-            $comment_markup .= '<li id="comment-<%= comment_id %>" <%= comment_class %>>';
+            
+            
+            $comment_format = get_option('lc_comment_format');
+            
+            $bound = 'li';
+            if($comment_format == 'div'){
+                $bound = 'div';
+            }
+            
+            $comment_markup .= '<'.$bound.' id="comment-<%= comment_id %>" <%= comment_class %>>';
             $comment_markup .= $markup;
 //        $comment_markup .= '<div class="lc_review">'
 //                           .'<div class="lc_thumb"><a class="lc_thumb_btn lc_thumb_up_btn"></a><span class="lc_count">123</span></div>'
 //                           .'<div class="lc_thumb"><a class="lc_thumb_btn lc_thumb_down_btn"></a><span class="lc_count">333</span></div>'
 //                           .'</div>';
-            $comment_markup .= '</li>';
+            $comment_markup .= "</$bound>";
             $comment_markup .= '</script>';
 
             echo $comment_markup;

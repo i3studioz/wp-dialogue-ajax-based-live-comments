@@ -14,7 +14,6 @@ app.Comment = Backbone.Model.extend({
         email: '',
         website: '',
         avatar: '',
-        avatar_size: 96,
         comment_post_link: '',
         comment_iso_time: '',
         comment_date: '',

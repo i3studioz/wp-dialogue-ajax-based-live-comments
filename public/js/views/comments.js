@@ -101,7 +101,6 @@ app.CommentView = Backbone.View.extend({
             email: this.$email.val().trim(),
             website: this.$website.val().trim(),
             avatar: '',
-            avatar_size: 96,
             comment_post_link: '',
             comment_iso_time: '',
             comment_date: '',
@@ -184,9 +183,9 @@ app.CommentView = Backbone.View.extend({
 //        } else 
         if (type == 'new') {
             if (lc_vars.comment_order == 'desc')
-                $('ol.comment-list', this.el).prepend(this.template(item_json));
+                $('.comment-list', this.el).prepend(this.template(item_json));
             else
-                $('ol.comment-list', this.el).append(this.template(item_json));
+                $('.comment-list', this.el).append(this.template(item_json));
 
             var $old_color = $('#div-comment-' + item_json.comment_id).css('background-color');
             $('#div-comment-' + item_json.comment_id).css('background-color', lc_vars.new_item_color);
@@ -197,9 +196,9 @@ app.CommentView = Backbone.View.extend({
 
         } else {
             if (lc_vars.comment_order == 'desc')
-                $('ol.comment-list', this.el).append(this.template(item_json));
+                $('.comment-list', this.el).append(this.template(item_json));
             else
-                $('ol.comment-list', this.el).prepend(this.template(item_json));
+                $('.comment-list', this.el).prepend(this.template(item_json));
         }
     },
     updateCommentHeader: function () {

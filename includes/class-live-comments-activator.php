@@ -113,6 +113,7 @@ class Live_Comments_Activator {
                                     <div class="comment-metadata">
                                         <a href="{{comment_post_link}}">{{comment_date}}</a>
                                     </div><!-- .comment-metadata -->
+                                    {{moderation_message}}
                                 </footer><!-- .comment-meta -->
 
                                 <div class="comment-content">
