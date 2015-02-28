@@ -9,10 +9,11 @@ app.CommentView = Backbone.View.extend({
     events: {
         'submit form#commentform': 'saveComment',
         'click #load-new-comments': 'addNewComments',
-        'click #load-old-comments': 'addPagedComments'
+        'click #load-old-comments': 'addPagedComments',
+        'click #lc-refresh': 'reloadAll'
     },
     initialize: function (app_vars) {
-        _.bindAll(this, 'render', 'saveComment', 'appendItem', 'getLiveComments', 'updateCommentHeader');
+        _.bindAll(this, 'render', 'saveComment', 'appendItem', 'getLiveComments', 'reloadAll');
 
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
@@ -23,6 +24,7 @@ app.CommentView = Backbone.View.extend({
         var comments_json = app_vars.db_comments; //$.parseJSON(app_vars.db_comments);
         this.collection = new app.CommentList(comments_json);
         this.collection.bind('add', this.appendItem);
+        //this.collection.bind('reset', this.appendAll);
         this.collection.bind('add', this.updateCommentHeader);
         this.collection.meta('total_comments', lc_vars.initial_count);
         this.initializeLiveVars();
@@ -41,6 +43,17 @@ app.CommentView = Backbone.View.extend({
     },
     render: function () {
 
+        var self = this;
+        _(this.collection.models).each(function (comment) {
+            self.appendItem(comment);
+        }, this);
+
+    },
+    appendAll: function (models) {
+        //console.log(models);
+        this.collection.reset(models);
+        self.restartLiveFetch();
+        $('.comment-list', this.el).html('');
         var self = this;
         _(this.collection.models).each(function (comment) {
             self.appendItem(comment);
@@ -84,6 +97,26 @@ app.CommentView = Backbone.View.extend({
                         $(this).remove();
                     })
                 }
+            },
+            error: function (collection, response) {
+                self.restartLiveFetch();
+                //console.log(response);
+            }
+        });
+    },
+    reloadAll: function(){
+        console.log('reloadAll');
+        
+        clearInterval(this.liveLoader);
+        this.collection.meta('read_type', 'reload');
+
+        var self = this;
+        this.collection.fetch({
+            silent: true,
+            success: function (collection, response) {
+
+                //console.log(collection);
+                self.appendAll(response);
             },
             error: function (collection, response) {
                 self.restartLiveFetch();

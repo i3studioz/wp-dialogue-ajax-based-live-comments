@@ -112,24 +112,15 @@ class Live_Comments_Public {
         $args = array(
             'post_id' => $post_id,
             'order' => 'desc',
-            'status' => 'approve'
+            //'status' => 'approve'
         );
 
         if (get_option('page_comments') && !(isset($_GET['type']) && $_GET['type'] == 'newer')) {
             $args['number'] = get_option('comments_per_page');
         }
-        if (isset($_GET['type'])) {
-            switch ($_GET['type']) {
-                case 'newer':
-                    $args['date_query'] = array('after' => $_GET['new_start']);
-                    break;
-                case 'older':
-                    $args['date_query'] = array('before' => $_GET['old_start']);
-                    break;
-
-                default:
-                    $args['date_query'] = array('after' => $_GET['new_start']);
-            }
+        
+        if(isset($_GET['type'])){
+            $args['date_query'] = $this->lc_date_query($_GET['type']);
         }
 
         $comments = get_comments($args);
@@ -137,8 +128,11 @@ class Live_Comments_Public {
         foreach ($comments as $comment) {
             if ($doing_ajax && isset($_GET['type']) && $_GET['type'] == 'newer' && ($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)) {
                 continue;
+            }else if($comment->comment_approved == 0 && !($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)){
+                //var_dump($comment->comment_approved == 0 && ($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email));
+                continue;
             }
-
+            
             $comment_array = $this->lc_get_comment_data($comment);
 
             if ($comment->comment_parent) {
@@ -171,7 +165,29 @@ class Live_Comments_Public {
             return $localized_comment;
         }
     }
-
+    /**
+     * 
+     */
+    
+    function lc_date_query($type){
+            switch ($type) {
+                case 'newer':
+                    $date_query = array('after' => $_GET['new_start']);
+                    break;
+                case 'older':
+                    $date_query = array('before' => $_GET['old_start']);
+                    break;
+                case 'reload':
+                    $date_query = array('before' => $_GET['new_start']);
+                    $date_query = array('after' => $_GET['old_start']);
+                    break;
+                default:
+                    $date_query = array('after' => $_GET['new_start']);
+            }
+            
+            return $date_query;
+    }
+    
     /**
      * Save comments to database
      * @global int $comment_depth
@@ -258,10 +274,10 @@ class Live_Comments_Public {
             do_action('pre_comment_on_post', $comment_post_ID);
         }
 
-        $comment_author = ( isset($post_vars['author']) ) ? trim(strip_tags($post_vars['author'])) : null;
-        $comment_author_email = ( isset($post_vars['email']) ) ? trim($post_vars['email']) : null;
-        $comment_author_url = ( isset($post_vars['website']) ) ? trim($post_vars['website']) : null;
-        $comment_content = ( isset($post_vars['comment']) ) ? trim($post_vars['comment']) : null;
+        $comment_author = ( isset($post_vars['author']) ) ? trim(sanitize_text_field(strip_tags($post_vars['author']))) : null;
+        $comment_author_email = ( isset($post_vars['email']) ) ? trim(sanitize_email($post_vars['email'])) : null;
+        $comment_author_url = ( isset($post_vars['website']) ) ? trim(sanitize_text_field($post_vars['website'])) : null;
+        $comment_content = ( isset($post_vars['comment']) ) ? trim(sanitize_text_field($post_vars['comment'])) : null;
 
 
 // If the user is logged in
