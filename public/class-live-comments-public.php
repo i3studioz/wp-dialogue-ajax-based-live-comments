@@ -112,14 +112,14 @@ class Live_Comments_Public {
         $args = array(
             'post_id' => $post_id,
             'order' => 'desc',
-            //'status' => 'approve'
+                //'status' => 'approve'
         );
 
-        if (get_option('page_comments') && !(isset($_GET['type']) && $_GET['type'] == 'newer')) {
+        if (get_option('page_comments') && !(isset($_GET['type']) && ($_GET['type'] == 'newer' || $_GET['type'] == 'reload'))) {
             $args['number'] = get_option('comments_per_page');
         }
-        
-        if(isset($_GET['type'])){
+
+        if (isset($_GET['type'])) {
             $args['date_query'] = $this->lc_date_query($_GET['type']);
         }
 
@@ -128,11 +128,11 @@ class Live_Comments_Public {
         foreach ($comments as $comment) {
             if ($doing_ajax && isset($_GET['type']) && $_GET['type'] == 'newer' && ($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)) {
                 continue;
-            }else if($comment->comment_approved == 0 && !($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)){
+            } else if ($comment->comment_approved == 0 && !($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email)) {
                 //var_dump($comment->comment_approved == 0 && ($comment->comment_author_email == $commenter['comment_author_email'] || $comment->comment_author_email == $current_user->user_email));
                 continue;
             }
-            
+
             $comment_array = $this->lc_get_comment_data($comment);
 
             if ($comment->comment_parent) {
@@ -165,29 +165,34 @@ class Live_Comments_Public {
             return $localized_comment;
         }
     }
+
     /**
      * 
      */
-    
-    function lc_date_query($type){
-            switch ($type) {
-                case 'newer':
-                    $date_query = array('after' => $_GET['new_start']);
-                    break;
-                case 'older':
-                    $date_query = array('before' => $_GET['old_start']);
-                    break;
-                case 'reload':
-                    $date_query = array('before' => $_GET['new_start']);
-                    $date_query = array('after' => $_GET['old_start']);
-                    break;
-                default:
-                    $date_query = array('after' => $_GET['new_start']);
-            }
-            
-            return $date_query;
+    function lc_date_query($type) {
+        switch ($type) {
+            case 'newer':
+                $date_query = array('after' => $_GET['new_start']);
+                break;
+            case 'older':
+                $date_query = array('before' => $_GET['old_start']);
+                break;
+            case 'reload':
+                $data_query = array();
+                $data_query['after'] = $_GET['old_start'];
+                if(get_option('lc_enable_live_refresh')){
+                    $data_query['before'] = $_GET['new_start'];
+                }
+                $data_query['inclusive'] = true;
+                //$date_query = array('before' => $_GET['new_start'], 'after' => $_GET['old_start'], 'inclusive' => true);
+                break;
+            default:
+                $date_query = array('after' => $_GET['new_start']);
+        }
+
+        return $date_query;
     }
-    
+
     /**
      * Save comments to database
      * @global int $comment_depth
@@ -357,7 +362,9 @@ class Live_Comments_Public {
                 $reply_link = get_comment_reply_link(array('depth' => $comment_depth, 'max_depth' => get_option('thread_comments_depth'), 'reply_text' => get_option('lc_reply_text')), $comment->comment_ID, $comment->comment_post_ID);
 
                 $comment_data['mention_link'] = $this->lc_prepare_mention_link($comment->comment_parent);
-                $this->lc_send_mention_mail($comment, $reply_link);
+                if (get_option('lc_enable_mentions_email')) {
+                    $this->lc_send_mention_mail($comment, $reply_link);
+                }
             }
         }
 
@@ -426,7 +433,7 @@ class Live_Comments_Public {
         // Additional headers
         $headers = 'From: ' . get_bloginfo('name') . ' <no-reply@' . $_SERVER['HTTP_HOST'] . '>' . $eol;
         // @todo Mail it
-        //return mail($to, $subject, $message, $headers);
+        return mail($to, $subject, $message, $headers);
     }
 
     /**
@@ -484,10 +491,11 @@ class Live_Comments_Public {
             $no_more = get_option('lc_no_more');
             $total_comment = get_comments_number();
             $current_time = date('Y-m-d H:i:s'); //2015-02-27 13:11:57
+            $live_refresh = get_option('lc_enable_live_refresh');
 //print_r($new_start);
             echo '<script type="text/javascript">
              /* <![CDATA[ */
-             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval, 'no_more_text' => __($no_more, $this->plugin_name), 'initial_count' => $total_comment, 'current_time' => $current_time)) .
+             var lc_vars = ' . json_encode(array('post_id' => $post_id, 'ajax_url' => admin_url('admin-ajax.php'), 'new_item_color' => $highlight_color, 'thread_comments' => get_option('thread_comments'), 'comment_order' => get_option('comment_order'), 'refresh_interval' => $interval, 'no_more_text' => __($no_more, $this->plugin_name), 'initial_count' => $total_comment, 'current_time' => $current_time, 'live_refresh' => $live_refresh)) .
             '/* ]]> */
             </script>';
         }
@@ -548,16 +556,16 @@ class Live_Comments_Public {
             $markup = str_replace('{{reply_link}}', '<%= reply_link %>', $markup);
             $markup = str_replace('{{children}}', '<ol class="children"></ol>', $markup);
             $comment_markup = '<script type="text/template" id="comments-template">';
-            
-            
+
+
             $comment_format = get_option('lc_comment_format');
-            
+
             $bound = 'li';
-            if($comment_format == 'div'){
+            if ($comment_format == 'div') {
                 $bound = 'div';
             }
-            
-            $comment_markup .= '<'.$bound.' id="comment-<%= comment_id %>" <%= comment_class %>>';
+
+            $comment_markup .= '<' . $bound . ' id="comment-<%= comment_id %>" <%= comment_class %>>';
             $comment_markup .= $markup;
 //        $comment_markup .= '<div class="lc_review">'
 //                           .'<div class="lc_thumb"><a class="lc_thumb_btn lc_thumb_up_btn"></a><span class="lc_count">123</span></div>'

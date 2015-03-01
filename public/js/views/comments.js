@@ -13,8 +13,7 @@ app.CommentView = Backbone.View.extend({
         'click #lc-refresh': 'reloadAll'
     },
     initialize: function (app_vars) {
-        _.bindAll(this, 'render', 'saveComment', 'appendItem', 'getLiveComments', 'reloadAll');
-
+        _.bindAll(this, 'render', 'saveComment', 'appendItem', 'getLiveComments', 'reloadAll', 'updateCommentHeader');
         this.$comment = this.$('#comment');
         this.$author = this.$('#author');
         this.$parent = this.$('#comment_parent');
@@ -34,11 +33,15 @@ app.CommentView = Backbone.View.extend({
         this.collection.meta('read_type', 'newer');
 
         this.counter = 0;
+
         var self = this;
         this.liveLoader = setInterval(function () {
-            self.getLiveComments();
+            if (Boolean(lc_vars.live_refresh)) {
+                self.getLiveComments();
+            }
         }, lc_vars.refresh_interval);
-               
+
+
         this.render();
     },
     render: function () {
@@ -52,7 +55,7 @@ app.CommentView = Backbone.View.extend({
     appendAll: function (models) {
         //console.log(models);
         this.collection.reset(models);
-        self.restartLiveFetch();
+        this.restartLiveFetch();
         $('.comment-list', this.el).html('');
         var self = this;
         _(this.collection.models).each(function (comment) {
@@ -104,9 +107,9 @@ app.CommentView = Backbone.View.extend({
             }
         });
     },
-    reloadAll: function(){
+    reloadAll: function () {
         console.log('reloadAll');
-        
+
         clearInterval(this.liveLoader);
         this.collection.meta('read_type', 'reload');
 
@@ -201,7 +204,9 @@ app.CommentView = Backbone.View.extend({
         var self = this;
         self.initializeLiveVars();
         self.liveLoader = setInterval(function () {
-            self.getLiveComments();
+            if (Boolean(lc_vars.live_refresh)) {
+                self.getLiveComments();
+            }
         }, lc_vars.refresh_interval);
     },
     appendItem: function (item) {
@@ -236,6 +241,7 @@ app.CommentView = Backbone.View.extend({
     },
     updateCommentHeader: function () {
         //comment_section_header
+        //alert(this.collection.meta('total_comments'));
         $('h2.comments-title').html(this.comment_section_header({count: this.collection.meta('total_comments')}));
     },
     addNewComments: function () {
@@ -279,7 +285,7 @@ app.CommentView = Backbone.View.extend({
         this.collection.meta('read_type', 'older');
         if (last) {
             this.collection.meta('old_start', last.get('comment_date'));
-        }else {
+        } else {
             this.collection.meta('old_start', lc_vars.current_time);
         }
     }

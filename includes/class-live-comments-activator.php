@@ -82,16 +82,25 @@ class Live_Comments_Activator {
                         {{reply_link}}
 
                         Sincerely,
-                        '.get_option('blogname').' Team';
+                        ' . get_option('blogname') . ' Team';
 
             add_option('lc_mention_mail_markup', $mail_markup);
         }
 
         // Comments Refresh Interval
         if (!get_option('lc_refresh_interval')) {
-            add_option('lc_refresh_interval', 10000);
+            add_option('lc_refresh_interval', 30000);
         }
-
+        // Comments Refresh Interval
+        if (!get_option('lc_enable_live_refresh')) {
+            add_option('lc_enable_live_refresh', 0);
+        }
+        
+        // Refresh comments link text
+        if (!get_option('lc_refresh_comments_text')) {
+            add_option('lc_refresh_comments_text', 'Refresh Comments');
+        } 
+        
         // New Comments Highlight Color
         if (!get_option('lc_highlight_color')) {
             add_option('lc_highlight_color', '#dff0d8');
@@ -102,9 +111,13 @@ class Live_Comments_Activator {
             add_option('lc_no_more', 'No more comments');
         }
 
+        // Text For No Comments Found
+        if (!get_option('lc_comment_format')) {
+            add_option('lc_comment_format', 'ul');
+        }
         // Comments Markup
         if (!get_option('lc_comment_markup')) {
-            
+
             $comment_markup = '<article id="div-comment-{{comment_id}}" class="comment-body">
                                 <footer class="comment-meta">
                                     <div class="comment-author vcard">{{avatar}}
@@ -122,7 +135,7 @@ class Live_Comments_Activator {
 
                                 <div class="reply">{{reply_link}}</div>
                                </article>';
-            
+
             add_option('lc_comment_markup', $comment_markup);
         }
 
@@ -130,7 +143,7 @@ class Live_Comments_Activator {
         if (!get_option('lc_new_comments_note')) {
             add_option('lc_new_comments_note', '<span>{{count}} new comments</span>');
         }
-        
+
         // Comment Section Header
         if (!get_option('lc_comment_section_header')) {
             add_option('lc_comment_section_header', '{{count}} thoughts on "{{post_name}}"');

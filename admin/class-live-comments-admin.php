@@ -152,12 +152,20 @@ class Live_Comments_Admin {
                     . '<p><strong>{{mention_link}} || </strong><span class="description">Mention text for the comment</span></p>'
                     . '</div>', $this->plugin_name))
         );
-
+        
         add_settings_field(
-                'lc_refresh_interval', __('Comments Refresh Interval', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_refresh_interval', 'type' => 'number', 'min' => 5000, 'steps' => 500, 'description' => __('Set refresh interval for fetching live comments.', $this->plugin_name)
+                'lc_enable_live_refresh', __('Enable Live Refresh', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_live_refresh', 'type' => 'checkbox', 'description' => '<i>Enable live loading of comments.</i>')
+        );
+        
+        add_settings_field(
+                'lc_refresh_interval', __('Comments Refresh Interval', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_refresh_interval', 'type' => 'number', 'min' => 5000, 'steps' => 1000, 'description' => __('Set refresh interval for fetching live comments.', $this->plugin_name)
                 )
         );
-
+        //
+        add_settings_field(
+                'lc_refresh_comments_text', __('Refresh Comments Text', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_refresh_comments_text', 'type' => 'text', 'description' => __('Link text for refresh all comments link.', $this->plugin_name)
+                )
+        );
         add_settings_field(
                 'lc_highlight_color', __('New Comment Highlight Color', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_highlight_color', 'type' => 'color')
         );
@@ -211,8 +219,12 @@ class Live_Comments_Admin {
         register_setting('discussion', 'lc_mention_mail_subject');
 
         register_setting('discussion', 'lc_mention_mail_markup');
+        
+        register_setting('discussion', 'lc_enable_live_refresh');
 
         register_setting('discussion', 'lc_refresh_interval');
+        
+        register_setting('discussion', 'lc_refresh_comments_text');
 
         register_setting('discussion', 'lc_highlight_color');
 
