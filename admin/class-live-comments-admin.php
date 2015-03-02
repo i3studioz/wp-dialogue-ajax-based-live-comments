@@ -122,10 +122,10 @@ class Live_Comments_Admin {
                 'lc_form_position', __('Comment Form Position', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_form_position', 'type' => 'radio', 'options' => array('top' => __('Above Comments', $this->plugin_name), 'bottom' => __('Below Comments', $this->plugin_name)))
         );
         add_settings_field(
-                'lc_enable_bootstrap', __('Enable Bootstrap For Form Fields', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_bootstrap', 'type' => 'checkbox', 'description' => '<i>Enable bootstrap for form fields</i>')
+                'lc_enable_bootstrap', __('Enable Bootstrap For Form Fields', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_bootstrap', 'type' => 'checkbox', 'description' => '<i>'.__('Enable bootstrap for form fields', $this->plugin_name).'</i>')
         );
         add_settings_field(
-                'lc_enable_mentions', __('Enable Mentions', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_mentions', 'type' => 'checkbox', 'description' => '<i>Overrides the comments nesting feature of WordPress with mentions. Uses the same settings though. The nesting depth will be used to check level of mentions allowed.</i>')
+                'lc_enable_mentions', __('Enable Mentions', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_mentions', 'type' => 'checkbox', 'description' => '<i>'.__('Overrides the comments nesting feature of WordPress with mentions. Uses the same settings though. The nesting depth will be used to check level of mentions allowed.', $this->plugin_name).'</i>')
         );
 
         add_settings_field(
@@ -133,7 +133,7 @@ class Live_Comments_Admin {
         );
 
         add_settings_field(
-                'lc_enable_mentions_email', __('Enable Mentions', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_mentions_email', 'type' => 'checkbox', 'description' => '<i>Enable emails on mentions.</i>')
+                'lc_enable_mentions_email', __('Enable Mentions', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_mentions_email', 'type' => 'checkbox', 'description' => '<i>'.__('Enable emails on mentions.', $this->plugin_name).'</i>')
         );
 
         add_settings_field(
@@ -154,11 +154,11 @@ class Live_Comments_Admin {
         );
         
         add_settings_field(
-                'lc_enable_live_refresh', __('Enable Live Refresh', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_live_refresh', 'type' => 'checkbox', 'description' => '<i>Enable live loading of comments.</i>')
+                'lc_enable_live_refresh', __('Enable Live Refresh', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_enable_live_refresh', 'type' => 'checkbox', 'description' => '<i>'.__('Enable live loading of comments.', $this->plugin_name).'</i>')
         );
         
         add_settings_field(
-                'lc_refresh_interval', __('Comments Refresh Interval', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_refresh_interval', 'type' => 'number', 'min' => 5000, 'steps' => 1000, 'description' => __('Set refresh interval for fetching live comments.', $this->plugin_name)
+                'lc_refresh_interval', __('Comments Refresh Interval', $this->plugin_name), array(&$this, 'lc_get_setting_field'), 'discussion', 'lc_settings', array('name' => 'lc_refresh_interval', 'type' => 'number', 'min' => 5000, 'steps' => 1000, 'description' => __('Set refresh interval for fetching live comments. <i>1000 = 1 second</i>', $this->plugin_name)
                 )
         );
         //
