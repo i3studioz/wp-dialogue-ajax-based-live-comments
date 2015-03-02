@@ -178,12 +178,12 @@ class Live_Comments_Public {
                 $date_query = array('before' => $_GET['old_start']);
                 break;
             case 'reload':
-                $data_query = array();
-                $data_query['after'] = $_GET['old_start'];
+                $date_query = array();
+                $date_query['after'] = $_GET['old_start'];
                 if(get_option('lc_enable_live_refresh')){
-                    $data_query['before'] = $_GET['new_start'];
+                    $date_query['before'] = $_GET['new_start'];
                 }
-                $data_query['inclusive'] = true;
+                $date_query['inclusive'] = true;
                 //$date_query = array('before' => $_GET['new_start'], 'after' => $_GET['old_start'], 'inclusive' => true);
                 break;
             default:
@@ -282,7 +282,7 @@ class Live_Comments_Public {
         $comment_author = ( isset($post_vars['author']) ) ? trim(sanitize_text_field(strip_tags($post_vars['author']))) : null;
         $comment_author_email = ( isset($post_vars['email']) ) ? trim(sanitize_email($post_vars['email'])) : null;
         $comment_author_url = ( isset($post_vars['website']) ) ? trim(sanitize_text_field($post_vars['website'])) : null;
-        $comment_content = ( isset($post_vars['comment']) ) ? trim(sanitize_text_field($post_vars['comment'])) : null;
+        $comment_content = ( isset($post_vars['comment']) ) ? trim($post_vars['comment']) : null;
 
 
 // If the user is logged in
@@ -397,7 +397,7 @@ class Live_Comments_Public {
             'comment_iso_time' => date('c', strtotime($comment->comment_date)),
             'comment_date' => $comment->comment_date,
             'comment_date_readable' => date(get_option('date_format') . ' ' . get_option('time_format'), strtotime($comment->comment_date)),
-            'comment' => $comment->comment_content,
+            'comment' => apply_filters('the_content',$comment->comment_content),
             'moderation_required' => !$comment->comment_approved,
             'position' => 'new',
             'reply_link' => '',
@@ -410,14 +410,17 @@ class Live_Comments_Public {
      */
     function lc_send_mention_mail($comment, $reply_link) {
         $mentioned = get_comment($comment->comment_parent);
-
+        
+        if(!$mentioned->comment_author_email)
+            return false;
+        
         $to = $mentioned->comment_author_email;
         $subject = get_option('lc_mention_mail_subject');
 
         $message = get_option('lc_mention_mail_markup');
         $message = str_replace('{{author}}', $comment->comment_author, $message);
         $message = str_replace('{{mentioned_author}}', $mentioned->comment_author, $message);
-        $message = str_replace('{{comment_post_link}}', esc_url(get_comment_link($comment->comment_ID)), $message);
+        $message = str_replace('{{comment_post_link}}', '<a href="'.esc_url(get_permalink($comment->comment_post_ID)).'">'.  get_the_title($comment->comment_post_ID).'</a>', $message);
         $message = str_replace('{{comment_date}}', date('d F Y', strtotime($comment->comment_date)), $message);
         $message = str_replace('{{comment}}', $comment->comment_content, $message);
         $message = str_replace('{{reply_link}}', $reply_link, $message);
@@ -428,10 +431,10 @@ class Live_Comments_Public {
 
         // To send HTML mail, the Content-type header must be set
         $headers = 'MIME-Version: 1.0' . $eol;
-        $headers .= 'Content-type: text/html; charset=iso-8859-1' . $eol;
+        $headers .= 'Content-type: text/html; charset=UTF-8' . $eol;
 
         // Additional headers
-        $headers = 'From: ' . get_bloginfo('name') . ' <no-reply@' . $_SERVER['HTTP_HOST'] . '>' . $eol;
+        $headers .= 'From: ' . get_bloginfo('name') . ' <' . get_bloginfo('admin_email') . '>' . $eol;
         // @todo Mail it
         return mail($to, $subject, $message, $headers);
     }

@@ -71,18 +71,12 @@ class Live_Comments_Activator {
         // Mention Mail Markup
         if (!get_option('lc_mention_mail_markup')) {
 
-            $mail_markup = 'Hello {{mentioned_author}},
-
-                        {{author}} has mentioned you in his recent reply to {{comment_post_link}}.
-
-                        He wrote,
-
-                        <code>{{mention_link}}{{comment}}</code>
-
-                        {{reply_link}}
-
-                        Sincerely,
-                        ' . get_option('blogname') . ' Team';
+            $mail_markup = 'Hello {{mentioned_author}},<br />'
+                    . '{{author}} has mentioned you in his recent reply to {{comment_post_link}}.<br />'
+                    . 'He wrote,<br />'
+                    . '<strong>{{mention_link}}</strong> {{comment}}<br />'
+                    . 'Sincerely,<br />'
+                    . get_option('blogname') . ' Team';
 
             add_option('lc_mention_mail_markup', $mail_markup);
         }
@@ -95,12 +89,12 @@ class Live_Comments_Activator {
         if (!get_option('lc_enable_live_refresh')) {
             add_option('lc_enable_live_refresh', 0);
         }
-        
+
         // Refresh comments link text
         if (!get_option('lc_refresh_comments_text')) {
             add_option('lc_refresh_comments_text', 'Refresh Comments');
-        } 
-        
+        }
+
         // New Comments Highlight Color
         if (!get_option('lc_highlight_color')) {
             add_option('lc_highlight_color', '#dff0d8');
@@ -118,23 +112,21 @@ class Live_Comments_Activator {
         // Comments Markup
         if (!get_option('lc_comment_markup')) {
 
-            $comment_markup = '<article id="div-comment-{{comment_id}}" class="comment-body">
-                                <footer class="comment-meta">
-                                    <div class="comment-author vcard">{{avatar}}
-                                         <b class="fn">{{author}}</b> <span class="says">says:</span>	
-                                    </div><!-- .comment-author -->
-                                    <div class="comment-metadata">
-                                        <a href="{{comment_post_link}}">{{comment_date}}</a>
-                                    </div><!-- .comment-metadata -->
-                                    {{moderation_message}}
-                                </footer><!-- .comment-meta -->
-
-                                <div class="comment-content">
-                                    <strong>{{mention_link}}</strong> {{comment}}
-                                </div><!-- .comment-content -->
-
-                                <div class="reply">{{reply_link}}</div>
-                               </article>';
+            $comment_markup = '<article id="div-comment-{{comment_id}}" class="comment-body">'
+                    . '<footer class="comment-meta">'
+                    . '<div class="comment-author vcard">{{avatar}}'
+                    . '<b class="fn">{{author}}</b> <span class="says">says:</span>'
+                    . '</div><!-- .comment-author -->'
+                    . '<div class="comment-metadata">'
+                    . '<a href="{{comment_post_link}}">{{comment_date}}</a>'
+                    . '</div><!-- .comment-metadata -->'
+                    . '{{moderation_message}}'
+                    . '</footer><!-- .comment-meta -->'
+                    . '<div class="comment-content">'
+                    . '<strong>{{mention_link}}</strong> {{comment}}'
+                    . '</div><!-- .comment-content -->'
+                    . '<div class="reply">{{reply_link}}</div>'
+                    . '</article>';
 
             add_option('lc_comment_markup', $comment_markup);
         }

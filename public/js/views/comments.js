@@ -95,6 +95,7 @@ app.CommentView = Backbone.View.extend({
 
                 // console.log(response.length);
                 self.restartLiveFetch();
+                self.initializePageVars();
                 if (response.length == 0) {
                     $('.comment-navigation .nav-previous').html(lc_vars.no_more_text).fadeOut(function () {
                         $(this).remove();
@@ -108,7 +109,7 @@ app.CommentView = Backbone.View.extend({
         });
     },
     reloadAll: function () {
-        console.log('reloadAll');
+        //console.log('reloadAll');
 
         clearInterval(this.liveLoader);
         this.collection.meta('read_type', 'reload');

@@ -51,7 +51,7 @@ if (get_option('lc_enable_bootstrap')) {
     }
     ?>  
     <nav id="comment-nav-above" class="comment-navigation" role="navigation">
-        <?php if (get_comment_pages_count() > 1 && get_option('page_comments') && get_option('lc_form_position') == 'bottom'): ?>
+        <?php if (get_comment_pages_count() > 0 && get_option('page_comments') && get_option('lc_form_position') == 'bottom'): ?>
             <a href="javascript:;" class="nav-previous" id="load-old-comments"><?php _e('Older Comments', 'live-coments'); ?></a>
         <?php endif; ?>
         <a class="nav-next" id="lc-refresh"> <?php _e(get_option('lc_refresh_comments_text'), 'wp-dialogue'); ?></a>
@@ -72,7 +72,7 @@ if (get_option('lc_enable_bootstrap')) {
         else:
             comment_form($args);
         endif;
-    }elseif (get_comment_pages_count() > 1 && get_option('page_comments')) {
+    }elseif (get_comment_pages_count() > 0 && get_option('page_comments')) {
         ?>
         <nav id="comment-nav-below" class="comment-navigation" role="navigation">
             <a href="javascript:;" class="nav-previous" id="load-old-comments"><?php _e('Older Comments', 'live-coments'); ?></a>
