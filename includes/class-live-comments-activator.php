@@ -87,7 +87,7 @@ class Live_Comments_Activator {
         }
         // Comments Refresh Interval
         if (!get_option('lc_enable_live_refresh')) {
-            add_option('lc_enable_live_refresh', 0);
+            add_option('lc_enable_live_refresh', 1);
         }
 
         // Refresh comments link text

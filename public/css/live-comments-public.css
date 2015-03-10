@@ -26,3 +26,9 @@
     background: #F44336 url("../imgs/thumbs.png") no-repeat -32px 0
 }
 .lc_count{}
+
+#load-new-comments{
+    text-align: center;
+    cursor: pointer;
+    display: none
+}

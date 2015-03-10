@@ -19,7 +19,8 @@
  * Version:           1.0.0
  * Author:            WP Team @ i3studioz
  * Author URI:        http://www.i3studioz.com/
- * License:           Copyright 2015 i3studioz.com
+ * License:           GPLv2 or later
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-dialogue
  * Domain Path:       /languages
  */

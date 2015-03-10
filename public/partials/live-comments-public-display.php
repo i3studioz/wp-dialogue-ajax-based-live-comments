@@ -56,7 +56,7 @@ if (get_option('lc_enable_bootstrap')) {
         <?php endif; ?>
         <a class="nav-next" id="lc-refresh"> <?php _e(get_option('lc_refresh_comments_text'), 'wp-dialogue'); ?></a>
     </nav><!-- #comment-nav-below -->
-    <a href="javascript:;" id="load-new-comments"></a>
+    <div class="alert alert-info" role="alert" id="load-new-comments"></div>
     <?php
     $comment_format = get_option('lc_comment_format') ? get_option('lc_comment_format') : 'ul';
     echo "<$comment_format class='comment-list'></$comment_format>";

@@ -72,7 +72,9 @@ app.CommentView = Backbone.View.extend({
             remove: false,
             silent: true,
             success: function (collection, response) {
-                $('#load-new-comments').html(self.new_template({count: response.length}));
+                if (response.length > 0) {
+                    $('#load-new-comments').html(self.new_template({count: response.length})).show('slow');
+                }
                 //console.log(response);
                 //self.restartLiveFetch();
             },
@@ -96,10 +98,12 @@ app.CommentView = Backbone.View.extend({
                 // console.log(response.length);
                 self.restartLiveFetch();
                 self.initializePageVars();
-                if (response.length == 0) {
-                    $('.comment-navigation .nav-previous').html(lc_vars.no_more_text).fadeOut(function () {
-                        $(this).remove();
-                    })
+                if (response.length <= 0) {
+                    $('.comment-navigation .nav-previous')
+                            .html(lc_vars.no_more_text)
+                            .fadeOut(function(){
+                                $(this).remove();
+                            });
                 }
             },
             error: function (collection, response) {
@@ -256,7 +260,7 @@ app.CommentView = Backbone.View.extend({
         }, this);
         this.updateCommentHeader();
         this.initializeLiveVars();
-        $('#load-new-comments').html('');
+        $('#load-new-comments').html('').hide('slow');
     },
     initializeLiveVars: function () {
         var first = false;
