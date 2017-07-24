@@ -1,16 +1,15 @@
-=== WP Dialogue ===
-Contributors: i3studioz
-Donate link: http://www.i3studioz.com/wp-dialogue/
-Tags: comments, live discussion, ajax, WordPress Comments
+=== WP Live Comments ===
+Contributors: i3studioz, arun_singh
+Tags: comments, live chat, ajax, 
 Requires at least: 4.1
-Tested up to: 4.1
-Stable tag: 4.3
+Tested up to: 4.8
+Stable tag: 4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-WP Dialogue is a WordPress plugin which converts the WordPress native commenting system into a live discussion system.  It uses all the native features of WordPress so that there is minimal chances of breaking with updates. The plugin retains the ease of usability of the WordPress's commenting and provides multiple options to make it compatible with your current theme's look. 
+WP Live Comments is a WordPress plugin which converts the WordPress native commenting system into a live discussion system.  It uses all the native features of WordPress so that there is minimal chances of breaking with updates. The plugin retains the ease of usability of the WordPress's commenting and provides multiple options to make it compatible with your current theme's look. 
 
 = Features: =
 
@@ -24,14 +23,6 @@ WP Dialogue is a WordPress plugin which converts the WordPress native commenting
 * Instant alert on new comments posted by other users
 * Allow users to comment without forcing them to create an account
 * Options to make compatible with Bootstrap 3
-
-= Live Preview =
-
-<a href="http://www.i3studioz.com/wp-dialogue/hello-world/"> http://www.i3studioz.com/wp-dialogue/hello-world </a>
-
-= Documentation =
-
-<a href="http://www.i3studioz.com/wp-dialogue/Documentation/">http://www.i3studioz.com/wp-dialogue/Documentation</a>
 
 == Installation ==
 
@@ -83,3 +74,6 @@ No, the plugin currently does not support nested looks for comments in front end
 = 1.0 =
 Initial Release
 This version fixes a security related bug.  Upgrade immediately.
+
+= 1.1.0 = 
+Tested with WordPress 4.8
