@@ -9,16 +9,14 @@
  * that starts the plugin.
  *
  * @link              http://www.i3studioz.com/wp-dialogue
- * @since             1.0.0
+ * @since             1.1.0
  * @package           WP_Dialogue
  *
  * @wordpress-plugin
- * Plugin Name:       WP Dialogue
- * Plugin URI:        http://www.i3studioz.com/wp-dialogue/
- * Description:       WP Dialogue is a WordPress plugin which converts the WordPress native commenting system into a live discussion system.  It uses all the native features of WordPress so that there is minimal chances of breaking with updates. The plugin retains the ease of usability of the WordPress's commenting and provides multiple options to make it compatible with your current theme's look.
- * Version:           1.0.0
- * Author:            WP Team @ i3studioz
- * Author URI:        http://www.i3studioz.com/
+ * Plugin Name:       WP Live Comments
+ * Description:       WP Live Comments is a WordPress plugin which converts the WordPress native commenting system into a live discussion system.  It uses all the native features of WordPress so that there is minimal chances of breaking with updates. The plugin retains the ease of usability of the WordPress's commenting and provides multiple options to make it compatible with your current theme's look.
+ * Version:           1.1.0
+ * Author:            i3studioz
  * License:           GPLv2 or later
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-dialogue
