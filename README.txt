@@ -13,16 +13,17 @@ WP Live Comments is a WordPress plugin which converts the WordPress native comme
 
 = Features: =
 
-* Uses WordPress's Native Commenting to provide the functionality
+* Turns WordPress Native Commenting to live discussion system
 * Fully Customizable to match your theme's design
 * Simple layout and easy to use for both administrator and users
-* Multiple settings available to enable & disable features of the plugin
+* Multiple settings available to custimize features of the plugin
 * Converts replies into mentions
-* Customizable email template for mentions
-* Live comment feeds
+* Sends custimized emails on mentions
+* Live comments feed
 * Instant alert on new comments posted by other users
-* Allow users to comment without forcing them to create an account
-* Options to make compatible with Bootstrap 3
+* Allow users to comment anonymously
+* Compatible with Bootstrap 3
+* Built On Backbone JS
 
 == Installation ==
 
